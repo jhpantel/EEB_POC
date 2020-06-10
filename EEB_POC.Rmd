@@ -1,0 +1,87 @@
+---
+title: "The EEB_POC Project"
+author: "The EEB_POC Collective"
+date: "6/10/2020"
+output: html_document
+---
+
+###Announcement
+To the EEB Community,
+
+We are writing to announce a new initiative - Papers of Color. It’s simple - the Twitter account [@EEB_POC] (https://twitter.com/EEB_POC) re-tweets scientific articles and pre-prints written by authors who self-identify as EEB researchers of color. If you are Black, Indigenous, Latinx, Asian, Pacific Islander, or *any* race or ethnicity where you identify as a person of color, and you are publishing in EEB, just @ us. We will quickly scan the paper to make sure (1) the person submitting is an author and (2) we’re not being trolled (nothing racist, homophobic, sexist, or otherwise bigoted is promoted in the paper), and we re-tweet.
+
+Why did we set this up? It’s also simple - we’re not being cited, funded, invited to join multi-author papers, or hired at the same rates as our peers [1,2,3]. We’re also doing excellent scientific work. The goal of this initiative is to find alternative paths for disseminating research of scientists of color that are immediate, and do not require waiting until the field increases diversity and representation.
+
+The main intent of @EEB_POC is to advertise our knowledge and skills to each other. It’s our intention that scientists who understand what it’s like to have their lives and contributions undervalued will find this a resource to locate like-minded colleagues to cite, collaborate with, and publish with. At the same time, we encourage **all** of our colleagues to follow the account and like and re-tweet what you see. Research networks need to diversify immediately, and @EEB_POC is our first effort to fast-track this process. Think more broadly about citing, funding, and hiring the scientists that come across your feed.
+
+There is a leaky pipeline for scientists of color and we can’t wait anymore while bright people drip through it. We’re here to make good on the promise to students of color that there is a place for them in the field of EEB.
+
+Sincerely,
+
+The EEB_POC Collective
+
+
+#####References
+1. Ginther, D. K., Basner, J., Jensen, U., Schnell, J., Kington, R., & Schaffer, W. T. (2018). Publications as predictors of racial and ethnic differences in NIH research awards. PloS One, 13(11).
+
+https://doi.org/10.1371/journal.pone.0205929
+
+2. Hofstra, B., Kulkarni, V. V., Galvez, S. M. N., He, B., Jurafsky, D., & McFarland, D. A. (2020). The Diversity–Innovation Paradox in Science. Proceedings of the National Academy of Sciences, 117(17), 9284-9291.
+
+https://doi.org/10.1073/pnas.1915378117
+
+3. Wanelik, KM, Griffin, JS, Head, ML, Ingleby, FC, Lewis, Z. (2020). Breaking barriers? Ethnicity and socioeconomic background impact on early career progression in the fields of ecology and evolution. Ecology & Evolution. 00: 1– 11.
+
+https://onlinelibrary.wiley.com/doi/full/10.1002/ece3.6423
+
+
+###Signatories / Moderators (Re-Tweeters)
+Jelena H. Pantel  
+Michelle Tseng  
+Jessica Ware  
+Rana El-Sabaawi  
+Michael Kantar
+
+
+###Guidelines
+We operate a Twitter account, @EEB_POC (‘Papers of Color - research published by Black, Indigenous, and underrepresented people of color scientists in the fields of Ecology, Evolution, & Behavior’) that re-tweets author-submitted papers from people who self-identify as EEB researchers and Persons of Color.
+
+The process is simple:
+
+1. 'Submissions' are simply tweets that @ the EEB_POC handle.
+
+2. We quickly scan the paper to confirm it does not contain any racist, homophobic, or other bigoted content (i.e. that someone is not sending something to troll the account).
+
+3. We re-tweet.
+
+4. We welcome a thread with any pictures, explanation, biographical info, or whatever else the submitting author cares to share.
+
+5. Papers can be in peer-reviewed journals and pre-prints are also accepted.
+
+6. You may not tag co-authors of color and submit on their behalf. It is each author's right to self-identify or not as they choose.
+
+### Project Motivation
+
+The field of Ecology, Evolution, & Behavior has a diversity problem. As recently demonstrated by colleagues in Ecology & Evolution, “socioeconomic background and ethnicity were associated with measures of career progression. While there was no difference in the number of reported first‐authored papers on PhD completion, ethnic minority respondents reported fewer other‐authored papers.” [Wanelik et al. 2020]
+
+https://onlinelibrary.wiley.com/doi/full/10.1002/ece3.6423
+
+The data speaks for itself:
+
+https://twitter.com/trayc7/status/1268608692036997120?s=20
+
+What this means is, we are publishing and producing research just like everyone else, but we’re not being invited to join research networks. This has an impact on research careers: "almost half of the responses concerning ‘overcoming barriers’ were from respondents who stated they had left academia due to a barrier they had not been able to move past."
+
+We are concerned. While we celebrate efforts of our peers to amplify diverse voices, we believe the data shows that our field is not valuing the quality work already being produced by Black, Indigenous, Latinx, Asian, and other scientists of color who have faced racial and ethnic discrimination both outside and inside the halls of academic research. We want to contribute to creating a research community that will not continue to reproduce abysmally low representation of scientists of color.
+
+@EEB_POC is intended to increase a dual power structure in the field of EEB. We want scientists of different races and ethnicities to have avenues to self-determine their research networks and career paths. We note that we greatly appreciate support from any and all, especially those who value that too much power lies in the hands of too few people in the field that decide which voices merit amplification. We hope our colleagues with genuine interest in diversifying the field will encourage their students and associates of color to submit, we very much want them to follow @EEB_POC and re-tweet, and we also encourage them to use the account to become more familiar with scientific work by diverse researchers already in the field and consider how to diversify their research networks.
+
+```{r,message=FALSE}
+par(bg = 'lightgrey')
+par(mar = c(.1, .1, .1, .1))
+library(viridis)
+x <- rep(1:73,9)
+y <- rep(1:9,each=73)
+plot(x,y,pch=19,col=sample(inferno(657,alpha=.25)),cex=7)
+```
+
