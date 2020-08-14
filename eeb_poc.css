@@ -23,7 +23,7 @@ body {
   height:auto;
   position: relative; 
   overflow: hidden; 
-  width: 670px;
+  width: 800px;
 }
 
 .Link
@@ -44,18 +44,18 @@ font-family:Arial, Helvetica, sans-serif;
 #mainPicture
 {
 clear:both;
-width:670px;
-height:345px;
+width:800px;
+height:600px;
 background-color:#000000;
 }
 
 #mainPicture .picture
 {
 position:relative;
-width:650px;
-height:325px;
+width:780px;
+height:600px;
 top:10px;
-margin-left:10px;
+margin-left:5px;
 background-image:url(eeb_poc1.png);
 background-repeat:no-repeat;
 }
@@ -65,8 +65,8 @@ background-repeat:no-repeat;
 position:relative;
 text-align:left;
 top:14px;
-left:22px;
-font-size:27px;
+left:10px;
+font-size:37px;
 color:#FFFFFF;
 font-family:Arial, Helvetica, sans-serif;
 }
@@ -76,8 +76,8 @@ font-family:Arial, Helvetica, sans-serif;
 position:relative;
 text-align:left;
 top:12px;
-left:22px;
-font-size:14px;
+left:12px;
+font-size:20px;
 color:#FFFFFF;
 font-family:Arial, Helvetica, sans-serif;
 }
@@ -85,7 +85,7 @@ font-family:Arial, Helvetica, sans-serif;
 .contentBox
 {
 margin-top:10px;
-width:670px;
+width:800px;
 height:auto;
 background-color:#000000;
 padding-bottom:20px;
@@ -95,7 +95,7 @@ padding-bottom:20px;
 {
 margin-left:10px;
 position:relative;
-width:650px;
+width:780px;
 height:auto;
 top:10px;
 background-image:url(contentBack.png);
