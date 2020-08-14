@@ -8,7 +8,7 @@ body {
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 13px;
 	color: #000000;
-	background: #FFFFF0;
+	background: #FFFFFF;
 	background-repeat:repeat-x;
 }
 *
@@ -141,32 +141,32 @@ text-align:center;
 padding-top:30px;
 font-size:9px;
 font-family:Arial, Helvetica, sans-serif;
-color:#C87002;
+color:#000000;
 margin:0px;
 }
 
 #footer a
 {
-color:#C87002;
+color:#000000;
 text-decoration:none;
 font-size:9px;
 }
 
 a
 {
-color:#C87002;
+color:#000000;
 text-decoration:none;
 }
 
 a:hover
 {
-color:#793C06
+color:#000000
 text-decoration:none;
 border-bottom:dotted 2px;
 }
 a:visited
 {
-color:#793C06;
+color:#000000;
 
 }
 
