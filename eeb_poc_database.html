@@ -14,56 +14,21 @@ Released under Creative Commons Attribution 2.5 Generic.
 <link href="tabulator-master/dist/css/tabulator.min.css" rel="stylesheet">
 <script type="text/javascript" src="tabulator-master/dist/js/tabulator.min.js"></script>
 
+<script type="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.5/jspdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/2.3.2/jspdf.plugin.autotable.js"></script>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.2.0/papaparse.min.js"></script>
+
+
+
+
+
+
 <title>EEB_POC: Papers of Color database</title>
 
-<script type="text/javascript">
-    window.TableLoader = {
-        tables:{},
-        register:function(table, func){
-            this.tables[table] = func;
-        },
-        trigger:function(key){
-            var self = this;
-
-            if(this.tables[key]){
-                this.tables[key]();
-                this.tables[key] = function(){};
-
-                var keys = Object.keys(this.tables);
-                var index = keys.indexOf(key);
-
-                if(index){
-                    this.tables[keys[index - 1]]();
-                    this.tables[keys[index - 1]] = function(){};
-                }
-
-                if(index < keys.length - 1){
-                    this.tables[keys[index + 1]]();
-                    this.tables[keys[index + 1]] = function(){};
-                }
-            }
-
-            if(key == "theming"){
-                var themes = Object.keys(this.tables).slice(-9);
-
-                themes.forEach(function(item){
-                    self.trigger(item);
-                })
-            }
-        },
-        loadFirst:function(){
-            first = Object.keys(this.tables)[0];
-
-            if(first){
-                this.trigger(first);
-            }
-        }
-    }
-</script>
 
 </head>
 
@@ -79,61 +44,48 @@ Released under Creative Commons Attribution 2.5 Generic.
 
 <p>Test version 4</p><br />
 
-<div>
-    <button id="data-trigger">Load Data</button>
-</div>
-<div id="eeb_poc-table"></div>
 
-<div id="eeb_poc-table"></div>
-<script type="text/javascript">
-    var table = new Tabulator("#eeb_poc-table", {
-    height:"311px",
-    layout:"fitColumns",
-    placeholder:"No Data Set",
-    columns:[
-        {title:"Authors", field:"Authors", sorter:"string", width:200},
-        {title:"Title", field:"Title", sorter:"string", width:200},
-        {title:"Publication", field:"Publication", sorter:"string",width:50},
-        {title:"Volume", field:"Volume", sorter:"number", width:25},
-        {title:"Number", field:"Number", sorter:"number", width:25},
-        {title:"Pages", field:"Pages", sorter:"number", width:25},
-        {title:"Year", field:"Year", sorter:"number", width:25},
-        {title:"Keywords", field:"Keywords", sorter:"string", width:100},
-        {title:"ORCID", field:"ORCID", sorter:"string", width:50},
-        {title:"DOI", field:"DOI", sorter:"string", width:50},
-,
-    ],
-});
+<!-- <input type="file" id="csv-file" name="files"/> -->
 
-        //trigger AJAX load on "Load Data via AJAX" button click
-        document.getElementById("data-trigger").addEventListener("click", function(){
-        table.setData("database/EEB_POC_database.csv");
-        });
-</script>
-<!-- 
 <script type="text/javascript">
-    TableLoader.register("ajax", function(){
-    var example_table_ajax = new Tabulator("#example-table-ajax", {
-        height:"311px",
-        layout:"fitColumns",
-        placeholder:"No Data Set",
-        columns:[
-        {title:"Name", field:"name", sorter:"string", width:200},
-        {title:"Progress", field:"progress", sorter:"number", formatter:"progress"},
-        {title:"Gender", field:"gender", sorter:"string"},
-        {title:"Rating", field:"rating", formatter:"star", hozAlign:"center", width:100},
-        {title:"Favourite Color", field:"col", sorter:"string"},
-        {title:"Date Of Birth", field:"dob", sorter:"date", hozAlign:"center"},
-        {title:"Driver", field:"car", hozAlign:"center", formatter:"tickCross", sorter:"boolean"},
-        ],
+    var tableData;
+
+    Papa.parse('EEB_POC_database.csv', {
+      header: true,
+      download: true,
+      dynamicTyping: true,
+      complete: function(results) {
+        console.log(results);
+        tableData = results.data;
+      }
     });
 
-    document.getElementById("ajax-trigger").addEventListener("click", function(){
-        example_table_ajax.setData("/exampledata/ajax");
-    })
-})
+//     var table = new Tabulator("#eeb_poc-table", {
+//     height:"311px",
+//     layout:"fitColumns",
+//     //placeholder:"No Data Set",
+//     data:tableData,
+//     columns:[
+//         {title:"Authors", field:"Authors", sorter:"string", width:200},
+//         {title:"Title", field:"Title", sorter:"string", width:200},
+//         {title:"Publication", field:"Publication", sorter:"string",width:50},
+//         {title:"Volume", field:"Volume", sorter:"number", width:25},
+//         {title:"Number", field:"Number", sorter:"number", width:25},
+//         {title:"Pages", field:"Pages", sorter:"number", width:25},
+//         {title:"Year", field:"Year", sorter:"number", width:25},
+//         {title:"Keywords", field:"Keywords", sorter:"string", width:100},
+//         {title:"ORCID", field:"ORCID", sorter:"string", width:50},
+//         {title:"DOI", field:"DOI", sorter:"string", width:50},
+// ,
+//     ],
+// });
+
+        // //trigger AJAX load on "Load Data via AJAX" button click
+        // document.getElementById("data-trigger").addEventListener("click", function(){
+        // table.setData("database/EEB_POC_database.csv");
+        // });
+
 </script>
- -->
 
 </body>
 
