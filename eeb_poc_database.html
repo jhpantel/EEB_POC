@@ -16,6 +16,50 @@ Released under Creative Commons Attribution 2.5 Generic.
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.5/jspdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/2.3.2/jspdf.plugin.autotable.js"></script>
 
+<script type="text/javascript">
+    window.TableLoader = {
+        tables:{},
+        register:function(table, func){
+            this.tables[table] = func;
+        },
+        trigger:function(key){
+            var self = this;
+
+            if(this.tables[key]){
+                this.tables[key]();
+                this.tables[key] = function(){};
+
+                var keys = Object.keys(this.tables);
+                var index = keys.indexOf(key);
+
+                if(index){
+                    this.tables[keys[index - 1]]();
+                    this.tables[keys[index - 1]] = function(){};
+                }
+
+                if(index < keys.length - 1){
+                    this.tables[keys[index + 1]]();
+                    this.tables[keys[index + 1]] = function(){};
+                }
+            }
+
+            if(key == "theming"){
+                var themes = Object.keys(this.tables).slice(-9);
+
+                themes.forEach(function(item){
+                    self.trigger(item);
+                })
+            }
+        },
+        loadFirst:function(){
+            first = Object.keys(this.tables)[0];
+
+            if(first){
+                this.trigger(first);
+            }
+        }
+    }
+</script>
 
 <title>EEB_POC: Papers of Color database</title>
 </head>
