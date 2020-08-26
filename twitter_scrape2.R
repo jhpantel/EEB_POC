@@ -29,7 +29,7 @@
 # Go here for more detailed instructions: 
 # https://cran.r-project.org/web/packages/rtweet/vignettes/auth.html
 #=============================================================================
-library(twitteR)
+library(rtweet)
 
 consumer_key <- consumer_key_nt
 consumer_secret <- consumer_secret_nt
@@ -40,5 +40,10 @@ setup_twitter_oauth(consumer_key, consumer_secret, access_token, access_secret)
 #=============================================================================
 #Load libraries
 #=============================================================================
+library(rtweet)
+library(ggplot2)
 library(tidyverse)
-library(twitteR)
+
+#=============================================================================
+#
+#=============================================================================
