@@ -23,7 +23,7 @@
 
 <body>
 
-<p>Test version 13</p><br />
+<p>Test version 14</p><br />
 
 <div id="example-table"></div>
 
@@ -72,7 +72,8 @@ var table2 = new Tabulator("#example-table2", {
 
 var tabledata2;
 
-    Papa.parse('https://jusinowicz.github.io/EEB_POC/database/EEB_POC_database.csv', {
+    Papa.parse(
+    	url:'https://jusinowicz.github.io/EEB_POC/database/EEB_POC_database.csv', {
       header: true,
       download: true,
       dynamicTyping: true,
