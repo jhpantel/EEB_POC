@@ -56,18 +56,30 @@ Released under Creative Commons Attribution 2.5 Generic.
 <script type="text/javascript">
 var table2 = new Tabulator("#eeb_poc-table", {
     height:"311px", // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
-    layout:"fitColumns", //fit columns to width of table (optional)
+    //layout:"fitColumns", //fit columns to width of table (optional)
+    // columns:[ //Define Table Columns
+    //    {title:"Authors", field:"Authors", sorter:"string", width:400},
+    //     {title:"Title", field:"Title", sorter:"string", width:400},
+    //     {title:"Publication", field:"Publication", sorter:"string",width:100},
+    //     {title:"Volume", field:"Volume", sorter:"number", width:50},
+    //     {title:"Number", field:"Number", sorter:"number", width:50},
+    //     {title:"Pages", field:"Pages", sorter:"number", width:50},
+    //     {title:"Year", field:"Year", sorter:"number", width:50},
+    //     {title:"Keywords", field:"Keywords", sorter:"string", width:200},
+    //     {title:"ORCID", field:"ORCID", sorter:"string", width:100},
+    //     {title:"DOI", field:"DOI", sorter:"string", width:100},
+    // ],
     columns:[ //Define Table Columns
-       {title:"Authors", field:"Authors", sorter:"string", width:400},
-        {title:"Title", field:"Title", sorter:"string", width:400},
-        {title:"Publication", field:"Publication", sorter:"string",width:100},
-        {title:"Volume", field:"Volume", sorter:"number", width:50},
-        {title:"Number", field:"Number", sorter:"number", width:50},
-        {title:"Pages", field:"Pages", sorter:"number", width:50},
-        {title:"Year", field:"Year", sorter:"number", width:50},
-        {title:"Keywords", field:"Keywords", sorter:"string", width:200},
-        {title:"ORCID", field:"ORCID", sorter:"string", width:100},
-        {title:"DOI", field:"DOI", sorter:"string", width:100},
+       {title:"Authors", field:"Authors", sorter:"string"},
+        {title:"Title", field:"Title", sorter:"string"},
+        {title:"Publication", field:"Publication", sorter:"string"},
+        {title:"Volume", field:"Volume", sorter:"number"},
+        {title:"Number", field:"Number", sorter:"number"},
+        {title:"Pages", field:"Pages", sorter:"number"},
+        {title:"Year", field:"Year", sorter:"number"},
+        {title:"Keywords", field:"Keywords", sorter:"string"},
+        {title:"ORCID", field:"ORCID", sorter:"string"},
+        {title:"DOI", field:"DOI", sorter:"string"},
     ],
     // rowClick:function(e, row){ //trigger an alert message when the row is clicked
     //     alert("Row " + row.getData().id + " Clicked!!!!");
