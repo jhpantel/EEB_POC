@@ -23,7 +23,7 @@
 
 <body>
 
-<p>Test version 14</p><br />
+<p>Test version 15</p><br />
 
 <div id="example-table"></div>
 
@@ -72,16 +72,23 @@ var table2 = new Tabulator("#example-table2", {
 
 var tabledata2;
 
-    Papa.parse(
-    	url:'https://jusinowicz.github.io/EEB_POC/database/EEB_POC_database.csv', {
-      header: true,
-      download: true,
-      dynamicTyping: true,
-      complete: function(results) {
-        console.log(results);
-        tabledata2 = results.data;
-      }
-    });
+Papa.parse('database/EEB_POC_database.csv', {
+	complete: function(results) {
+		console.log("Finished:", 
+			tabledata2 =results.data);
+	}
+});
+
+    // Papa.parse(
+    // 	url:'https://jusinowicz.github.io/EEB_POC/database/EEB_POC_database.csv', {
+    //   header: true,
+    //   download: true,
+    //   dynamicTyping: true,
+    //   complete: function(results) {
+    //     console.log(results);
+    //     tabledata2 = results.data;
+    //   }
+    // });
 
 table2.setData(tabledata2);
 
