@@ -46,9 +46,47 @@ Released under Creative Commons Attribution 2.5 Generic.
     </div>
 </div>
 
-<p>Test version 5</p><br />
+<div class="contentText">
+<p>This is the database of papers representing EEB_POC. These papers have been collected from our Twitter account (@EEB_POC) and submitted by those that self-identify as POC. </p><br />
+<p>If you would like to submit a paper to the databse, please use follow the link below to use our submission form</p><br />
+<script type="text/javascript">
 
+JLabel hyperlink = new JLabel("Visit CodeJava");
+hyperlink.setForeground(Color.BLUE.darker());
+hyperlink.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+hyperlink.addMouseListener(new MouseAdapter() {
+ 
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        // the user clicks on the label
+    }
+ 
+    @Override
+    public void mouseEntered(MouseEvent e) {
+        // the mouse has entered the label
+    }
+ 
+    @Override
+    public void mouseExited(MouseEvent e) {
+        // the mouse has exited the label
+    }
+});
+
+@Override
+public void mouseClicked(MouseEvent e) {
+    try {
+         
+        Desktop.getDesktop().browse(new URI("https://mdeith.shinyapps.io/submission_form_shiny/"));
+         
+    } catch (IOException | URISyntaxException e1) {
+        e1.printStackTrace();
+    }
+}
 </script>
+
+</div>
+
+
 
 <div id="eeb_poc-table"></div>
 
@@ -57,16 +95,16 @@ var table2 = new Tabulator("#eeb_poc-table", {
     height:"311px", // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
     layout:"fitColumns", //fit columns to width of table (optional)
     columns:[ //Define Table Columns
-       {title:"Authors", field:"Authors", sorter:"string", width:200},
-        {title:"Title", field:"Title", sorter:"string", width:200},
-        {title:"Publication", field:"Publication", sorter:"string",width:50},
-        {title:"Volume", field:"Volume", sorter:"number", width:25},
-        {title:"Number", field:"Number", sorter:"number", width:25},
-        {title:"Pages", field:"Pages", sorter:"number", width:25},
-        {title:"Year", field:"Year", sorter:"number", width:25},
-        {title:"Keywords", field:"Keywords", sorter:"string", width:100},
-        {title:"ORCID", field:"ORCID", sorter:"string", width:50},
-        {title:"DOI", field:"DOI", sorter:"string", width:50},
+       {title:"Authors", field:"Authors", sorter:"string", width:400},
+        {title:"Title", field:"Title", sorter:"string", width:400},
+        {title:"Publication", field:"Publication", sorter:"string",width:100},
+        {title:"Volume", field:"Volume", sorter:"number", width:50},
+        {title:"Number", field:"Number", sorter:"number", width:50},
+        {title:"Pages", field:"Pages", sorter:"number", width:50},
+        {title:"Year", field:"Year", sorter:"number", width:50},
+        {title:"Keywords", field:"Keywords", sorter:"string", width:200},
+        {title:"ORCID", field:"ORCID", sorter:"string", width:100},
+        {title:"DOI", field:"DOI", sorter:"string", width:100},
     ],
     // rowClick:function(e, row){ //trigger an alert message when the row is clicked
     //     alert("Row " + row.getData().id + " Clicked!!!!");
@@ -88,69 +126,6 @@ Papa.parse('database/EEB_POC_database.csv', {
 </script>
 
 
-<!-- 
-
-<div>
-    <button id="data-trigger">Load Data</button>
-</div>
-<div id="eeb_poc-table"></div>
-
-<div id="eeb_poc-table"></div>
-<script type="text/javascript">
-    var table = new Tabulator("#eeb_poc-table", {
-    height:"311px",
-    layout:"fitColumns",
-    placeholder:"No Data Set",
-
-    ],
-});
- //trigger AJAX load on "Load Data via AJAX" button click
-        document.getElementById("data-trigger").addEventListener("click", function(){
-        table.setData("database/EEB_POC_database.csv");
-        });
-</script> -->
-<!-- 
-<div id="eeb_poc-table"></div>
-<script type="text/javascript">
-    var tableData;
-
-    Papa.parse('database/EEB_POC_database.csv', {
-      header: true,
-      download: true,
-      dynamicTyping: true,
-      complete: function(results) {
-        console.log(results);
-        tableData = results.data;
-      }
-    });
-
-    var table = new Tabulator("#eeb_poc-table", {
-    height:"311px",
-    layout:"fitColumns",
-    //placeholder:"No Data Set",
-    data:tableData,
-    columns:[
-        {title:"Authors", field:"Authors", sorter:"string", width:200},
-        {title:"Title", field:"Title", sorter:"string", width:200},
-        {title:"Publication", field:"Publication", sorter:"string",width:50},
-        {title:"Volume", field:"Volume", sorter:"number", width:25},
-        {title:"Number", field:"Number", sorter:"number", width:25},
-        {title:"Pages", field:"Pages", sorter:"number", width:25},
-        {title:"Year", field:"Year", sorter:"number", width:25},
-        {title:"Keywords", field:"Keywords", sorter:"string", width:100},
-        {title:"ORCID", field:"ORCID", sorter:"string", width:50},
-        {title:"DOI", field:"DOI", sorter:"string", width:50},
-,
-    ],
-});
-
-        // //trigger AJAX load on "Load Data via AJAX" button click
-        // document.getElementById("data-trigger").addEventListener("click", function(){
-        // table.setData("database/EEB_POC_database.csv");
-        // });
-
-</script>
-<div id="eeb_poc-table"></div> -->
 
 
 </body>
