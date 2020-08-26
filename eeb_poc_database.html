@@ -44,9 +44,6 @@ Released under Creative Commons Attribution 2.5 Generic.
 
 <p>Test version 4</p><br />
 
-
-<!-- <input type="file" id="csv-file" name="files"/> -->
-
 <script type="text/javascript">
     var tableData;
 
@@ -60,25 +57,25 @@ Released under Creative Commons Attribution 2.5 Generic.
       }
     });
 
-//     var table = new Tabulator("#eeb_poc-table", {
-//     height:"311px",
-//     layout:"fitColumns",
-//     //placeholder:"No Data Set",
-//     data:tableData,
-//     columns:[
-//         {title:"Authors", field:"Authors", sorter:"string", width:200},
-//         {title:"Title", field:"Title", sorter:"string", width:200},
-//         {title:"Publication", field:"Publication", sorter:"string",width:50},
-//         {title:"Volume", field:"Volume", sorter:"number", width:25},
-//         {title:"Number", field:"Number", sorter:"number", width:25},
-//         {title:"Pages", field:"Pages", sorter:"number", width:25},
-//         {title:"Year", field:"Year", sorter:"number", width:25},
-//         {title:"Keywords", field:"Keywords", sorter:"string", width:100},
-//         {title:"ORCID", field:"ORCID", sorter:"string", width:50},
-//         {title:"DOI", field:"DOI", sorter:"string", width:50},
-// ,
-//     ],
-// });
+    var table = new Tabulator("#eeb_poc-table", {
+    height:"311px",
+    layout:"fitColumns",
+    //placeholder:"No Data Set",
+    data:tableData,
+    columns:[
+        {title:"Authors", field:"Authors", sorter:"string", width:200},
+        {title:"Title", field:"Title", sorter:"string", width:200},
+        {title:"Publication", field:"Publication", sorter:"string",width:50},
+        {title:"Volume", field:"Volume", sorter:"number", width:25},
+        {title:"Number", field:"Number", sorter:"number", width:25},
+        {title:"Pages", field:"Pages", sorter:"number", width:25},
+        {title:"Year", field:"Year", sorter:"number", width:25},
+        {title:"Keywords", field:"Keywords", sorter:"string", width:100},
+        {title:"ORCID", field:"ORCID", sorter:"string", width:50},
+        {title:"DOI", field:"DOI", sorter:"string", width:50},
+,
+    ],
+});
 
         // //trigger AJAX load on "Load Data via AJAX" button click
         // document.getElementById("data-trigger").addEventListener("click", function(){
