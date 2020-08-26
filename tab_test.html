@@ -23,7 +23,7 @@
 
 <body>
 
-<p>Test version 15</p><br />
+<p>Test version 16</p><br />
 
 <div id="example-table"></div>
 
@@ -75,7 +75,9 @@ var tabledata2;
 Papa.parse('database/EEB_POC_database.csv', {
 	complete: function(results) {
 		console.log("Finished:", 
-			tabledata2 =results.data);
+			tabledata2 =results.data
+			table2.setData(tabledata2) );
+
 	}
 });
 
@@ -90,7 +92,7 @@ Papa.parse('database/EEB_POC_database.csv', {
     //   }
     // });
 
-table2.setData(tabledata2);
+
 
 </script>
 
