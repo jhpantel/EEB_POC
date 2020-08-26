@@ -44,6 +44,26 @@ Released under Creative Commons Attribution 2.5 Generic.
 
 <p>Test version 4</p><br />
 
+<div>
+    <button id="data-trigger">Load Data</button>
+</div>
+<div id="eeb_poc-table"></div>
+
+<div id="eeb_poc-table"></div>
+<script type="text/javascript">
+    var table = new Tabulator("#eeb_poc-table", {
+    height:"311px",
+    layout:"fitColumns",
+    placeholder:"No Data Set",
+
+    ],
+});
+ //trigger AJAX load on "Load Data via AJAX" button click
+        document.getElementById("data-trigger").addEventListener("click", function(){
+        table.setData("database/EEB_POC_database.csv");
+        });
+</script>
+<!-- 
 <div id="eeb_poc-table"></div>
 <script type="text/javascript">
     var tableData;
@@ -84,7 +104,7 @@ Released under Creative Commons Attribution 2.5 Generic.
         // });
 
 </script>
-<div id="eeb_poc-table"></div>
+<div id="eeb_poc-table"></div> -->
 
 
 </body>
