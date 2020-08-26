@@ -26,15 +26,11 @@ Released under Creative Commons Attribution 2.5 Generic.
 <!-- PapaParse for reading csvs  -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.2.0/papaparse.min.js"></script>
 
-
-
-
-
-
 <title>EEB_POC: Papers of Color database</title>
 
-
 </head>
+
+<!-- Body  -->
 
 <body>
 <div id="page">
@@ -47,43 +43,9 @@ Released under Creative Commons Attribution 2.5 Generic.
 </div>
 
 <div class="contentText">
-<p>This is the database of papers representing EEB_POC. These papers have been collected from our Twitter account (@EEB_POC) and submitted by those that self-identify as POC. </p><br />
-<p>If you would like to submit a paper to the databse, please use follow the link below to use our submission form</p><br />
-<script type="text/javascript">
-
-JLabel hyperlink = new JLabel("Visit CodeJava");
-hyperlink.setForeground(Color.BLUE.darker());
-hyperlink.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-hyperlink.addMouseListener(new MouseAdapter() {
- 
-    @Override
-    public void mouseClicked(MouseEvent e) {
-        // the user clicks on the label
-    }
- 
-    @Override
-    public void mouseEntered(MouseEvent e) {
-        // the mouse has entered the label
-    }
- 
-    @Override
-    public void mouseExited(MouseEvent e) {
-        // the mouse has exited the label
-    }
-});
-
-@Override
-public void mouseClicked(MouseEvent e) {
-    try {
-         
-        Desktop.getDesktop().browse(new URI("https://mdeith.shinyapps.io/submission_form_shiny/"));
-         
-    } catch (IOException | URISyntaxException e1) {
-        e1.printStackTrace();
-    }
-}
-</script>
-
+<p>This is the database of papers representing EEB_POC. These papers have been collected from our Twitter account (@EEB_POC) and submitted by those that self-identify as POC. </p>
+<p>If you would like to submit a paper to the databse, please use follow the link below to use our submission form</p>
+<h2><a href="https://mdeith.shinyapps.io/submission_form_shiny/">SUBMIT</a></h2>
 </div>
 
 
