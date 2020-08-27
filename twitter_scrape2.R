@@ -49,9 +49,11 @@
 #Load libraries
 #=============================================================================
 library(rtweet)
+library(rvest)
 library(ggplot2)
 library(tidyverse)
 library(RCurl)
+library(httr)
 library(rcrossref)
 
 #Define this useful function
@@ -94,7 +96,7 @@ get_token()
 #	DOI
 #
 #=============================================================================
-eb1 = get_timeline("EEB_POC")
+eb1 = get_timeline("EEB_POC",n=20)
 
 #Search tweets for HTMLs that could lead to papers: 
 nt = dim(eb1)[1]
@@ -102,6 +104,7 @@ nt = dim(eb1)[1]
 new_papers = NULL
 
 n_index = 1
+
 for (n in 1:nt) {
 
 	html_y = grep("https:", eb1$text[n]) #Look for a web link
@@ -115,24 +118,27 @@ for (n in 1:nt) {
 		#page1 = paste("https:", sub(".*https:","",t1),sep="") 
 		page1 = paste("https:", sub("[\n|@| ].*","",sub(".*https:","",t1)),sep="" )
 		page1_u= decode.short.url(page1)
-		thepage_tmp = getURL(page1_u) 
-	
-		#Throw in a test to see if this is another redirect link: 
-		test1 = grepl("oved", thepage_tmp) | grepl("edirect", thepage_tmp)
-		#But if this is a whole webpage, set it back to false: 
-		#if(grepl("<!DOCTYPE html>",thepage_tmp) ) {test1 = FALSE }
+		#thepage_tmp = getURL(page1_u) 
+		#thepage = GET(page1_u,timeout(20)) %>% content("text")
+		thepage = html_text(read_html(page1_u) )
 
-		if(test1 == TRUE) {
-			page1_u=paste("https:",sub("\\\".*","",sub(".*https:","",thepage_tmp)),sep="") 
-			#Test the page validity: 
-			page_test = try(getURL(page1_u),silent=TRUE)
-			if(class(page_test) != 'try-error'){ 
-				thepage = getURL(page1_u) 
-			}
+		#Throw in a test to see if this is another redirect link: 
+
+		# test1 = grepl("oved", thepage_tmp) | grepl("edirect", thepage_tmp)
+		# #But if this is a whole webpage, set it back to false: 
+		# #if(grepl("<!DOCTYPE html>",thepage_tmp) ) {test1 = FALSE }
+
+		# if(test1 == TRUE) {
+		# 	page1_u=paste("https:",sub("\\\".*","",sub(".*https:","",thepage_tmp)),sep="") 
+		# 	#Test the page validity: 
+		# 	page_test = try(getURL(page1_u),silent=TRUE)
+		# 	if(class(page_test) != 'try-error'){ 
+		# 		thepage = getURL(page1_u) 
+		# 	}
 		
-		}else { 
-			thepage = thepage_tmp
-		}
+		# }else { 
+		# 	thepage = thepage_tmp
+		# }
 
 		#Download the page HTML 
 		page_test = try(getURL(page1_u),silent=TRUE)
@@ -140,88 +146,90 @@ for (n in 1:nt) {
 	 	if(class(page_test) != 'try-error'){ 
 			#Look for a DOI: 
 			test2 = grepl("doi",thepage)
-
-			#This DOI will only be valid with a certain format, so skip
-			#it if it doesn't conform (i.e. this could be reference within
-			#another kind of webpage). Also try a few different ways of 
-			#filtering it from the html data. 
-
-			#Filter 1: 
-			doi_test = 0 
-			doi_tmp = gsub(".*doi.org/*|*[\"|<].*", '',thepage)
-			if( nchar(doi_tmp)>1 & nchar(doi_tmp)< 40) { doi_test = 1}
 			
-			#Filter 2:
-			if ( doi_test != 1){   
-				doi_tmp = gsub(".*DOI\">*|*</a>.*",'',thepage)
-				if( nchar(doi_tmp)>1 & nchar(doi_tmp)< 40) { doi_test = 1}
-			}
-
-			#Filter 3:
-			if ( doi_test != 1){   
-				doi_tmp = gsub(".*DOI: *|*</.*", '',thepage)
-				if( nchar(doi_tmp)>1 & nchar(doi_tmp)< 40) { doi_test = 1}
-			}
-
-			#Filter 4:
-			if ( doi_test != 1){   
-				doi_tmp = gsub(".*doi.org/*|*[ ].*", '',thepage)
-				if( nchar(doi_tmp)>1 & nchar(doi_tmp)< 40) { doi_test = 1}
-			}
-
-			if(nchar(doi_tmp)<4) { test2 = FALSE}
-
-
 			if(test2 == TRUE){ 
-				#doi_tmp = gsub(".*doi.org/*|*[\"|<].*", '',thepage)
-				#Get the citation: 
-				cit1= cr_cn(doi_tmp,format="citeproc-json")
 
-				#Get the authors:
-				numb_a = dim(cit1$author)[1]
-				a_s = NULL
-				for(a in 1:numb_a){
-					a_s = c(a_s, paste(cit1$author[a,4],", ",cit1$author[a,3], sep=" ") )
+				#This DOI will only be valid with a certain format, so skip
+				#it if it doesn't conform (i.e. this could be reference within
+				#another kind of webpage). Also try a few different ways of 
+				#filtering it from the html data. 
+
+				#Filter 1: 
+				doi_test = 0 
+				doi_tmp = gsub(".*doi.org/*|*\"|</|\\n|\\r.*", '',thepage)
+				if( nchar(doi_tmp)>1 & nchar(doi_tmp)< 40) { doi_test = 1}
+				
+				#Filter 2:
+				if ( doi_test != 1){   
+					doi_tmp = gsub(".*DOI\">*|*</a>.*",'',thepage)
+					if( nchar(doi_tmp)>1 & nchar(doi_tmp)< 40) { doi_test = 1}
 				}
-				a_s = paste(a_s, collapse = '')
 
-				#Get the title:
-				ta = cit1$title
+				#Filter 3:
+				if ( doi_test != 1){   
+					doi_tmp = gsub(".*DOI: *|*</.*", '',thepage)
+					if( nchar(doi_tmp)>1 & nchar(doi_tmp)< 40) { doi_test = 1}
+				}
 
-				#Get the Publication
-				pa =  cit1$"container-title"
+				#Filter 4:
+				if ( doi_test != 1){   
+					doi_tmp = gsub(".*doi.org/*|*[ ].*", '',thepage)
+					if( nchar(doi_tmp)>1 & nchar(doi_tmp)< 40) { doi_test = 1}
+				}
 
-				#Get the Volume
-				va = cit1$volume
+				if(nchar(doi_tmp)<4 | grepl("/",doi_tmp) ==FALSE ) { test3 = FALSE}
+				if(try(cr_cn(doi_tmp,format="citeproc-json"),silent=TRUE)==NULL){ test3= FALSE}
 
-				#Get the Number
-				num = cit1$issue
+				if(test3 == TRUE){ 
+					#doi_tmp = gsub(".*doi.org/*|*[\"|<].*", '',thepage)
+					#Get the citation: 
+					cit1= cr_cn(doi_tmp,format="citeproc-json")
 
-				#Get the Pages 
-				pgs = cit1$page
+					#Get the authors:
+					numb_a = dim(cit1$author)[1]
+					a_s = NULL
+					for(a in 1:numb_a){
+						a_s = c(a_s, paste(cit1$author$family[a],", ",cit1$author$given[a], sep=" ") )
+					}
+					a_s = paste(a_s, collapse = '')
 
-				#Get the Year
-				ya = cit1$indexed[[1]][1]
-				
-				#Get the Keywords
-				ka = "0"
+					#Get the title:
+					ta = cit1$title
 
-				#Get the ORCID
-				oa = sub(".*orcid.org/",'', x=cit1$author$ORCID[[1]])
-				
-				#Get the DOI
-				da = cit1$DOI
+					#Get the Publication
+					pa =  cit1$"container-title"
 
-				#Put these all in the list: 
-				new_papers[[n_index]] = c( Authors=list(a_s), Title = list(ta), 
-					Publication = list(pa), Volume = list(va), Number = list(num),
-					Pages = list(pgs), Year = list(ya), Keywords=list(ka), 
-					"ORCID (lead author)" = oa, DOI = da  )
+					#Get the Volume
+					va = cit1$volume
 
-				n_index = n_index+1
+					#Get the Number
+					num = cit1$issue
+
+					#Get the Pages 
+					pgs = cit1$page
+
+					#Get the Year
+					ya = cit1$indexed[[1]][1]
+					
+					#Get the Keywords
+					ka = "0"
+
+					#Get the ORCID
+					oa = sub(".*orcid.org/",'', x=cit1$author$ORCID[[1]])
+					
+					#Get the DOI
+					da = cit1$DOI
+					print(da)
+					#Put these all in the list: 
+					new_papers[[n_index]] = c( Authors=list(a_s), Title = list(ta), 
+						Publication = list(pa), Volume = list(va), Number = list(num),
+						Pages = list(pgs), Year = list(ya), Keywords=list(ka), 
+						"ORCID (lead author)" = oa, DOI = da  )
+
+					n_index = n_index+1
+				}
+
 			}
-
-
 
 		}
 
