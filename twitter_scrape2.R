@@ -94,7 +94,7 @@ get_token()
 #	DOI
 #
 #=============================================================================
-eb1 = get_timeline("EEB_POC",n=100)
+eb1 = get_timeline("EEB_POC")
 
 #Search tweets for HTMLs that could lead to papers: 
 nt = dim(eb1)[1]
@@ -181,7 +181,7 @@ for (n in 1:nt) {
 				numb_a = dim(cit1$author)[1]
 				a_s = NULL
 				for(a in 1:numb_a){
-					a_s = c(a_s, paste(cit1$author[a,4],", ",cit1$author[a,3], sep="") )
+					a_s = c(a_s, paste(cit1$author[a,4],", ",cit1$author[a,3], sep=" ") )
 				}
 				a_s = paste(a_s, collapse = '')
 
@@ -229,7 +229,7 @@ for (n in 1:nt) {
 	}
 
 
-}
+} #26,27,31,33,37,43,48,71
 
 #=============================================================================
 # All of this information is then stored externally to a (possibly already
