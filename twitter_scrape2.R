@@ -54,6 +54,7 @@ library(tidyverse)
 library(RCurl)
 library(rcrossref)
 
+#Define this useful function
 decode.short.url = function(u) {
   x = try( getURL(u, header = TRUE, nobody = TRUE, followlocation = FALSE)
   		, silent=TRUE )
@@ -112,15 +113,22 @@ for (n in 1:nt) {
 		#Extract address. This is done in 2 steps due to prevalance of tiny
 		#esque URLs. 
 		#page1 = paste("https:", sub(".*https:","",t1),sep="") 
-		page1 = sub("\n.*","",sub(".*https:","",t1))
+		page1 = paste("https:", sub("[\n|@| ].*","",sub(".*https:","",t1)),sep="" )
 		page1_u= decode.short.url(page1)
 		thepage_tmp = getURL(page1_u) 
 	
 		#Throw in a test to see if this is another redirect link: 
 		test1 = grepl("oved", thepage_tmp) | grepl("edirect", thepage_tmp)
+		#But if this is a whole webpage, set it back to false: 
+		#if(grepl("<!DOCTYPE html>",thepage_tmp) ) {test1 = FALSE }
+
 		if(test1 == TRUE) {
 			page1_u=paste("https:",sub("\\\".*","",sub(".*https:","",thepage_tmp)),sep="") 
-			thepage = getURL(page1_u) 
+			#Test the page validity: 
+			page_test = try(getURL(page1_u),silent=TRUE)
+			if(class(page_test) != 'try-error'){ 
+				thepage = getURL(page1_u) 
+			}
 		
 		}else { 
 			thepage = thepage_tmp
@@ -129,11 +137,43 @@ for (n in 1:nt) {
 		#Download the page HTML 
 		page_test = try(getURL(page1_u),silent=TRUE)
 		#Check to make sure it is of a type that will work: 
-	 	if(class(thepage) != 'try-error'){ 
+	 	if(class(page_test) != 'try-error'){ 
 			#Look for a DOI: 
 			test2 = grepl("doi",thepage)
+
+			#This DOI will only be valid with a certain format, so skip
+			#it if it doesn't conform (i.e. this could be reference within
+			#another kind of webpage). Also try a few different ways of 
+			#filtering it from the html data. 
+
+			#Filter 1: 
+			doi_test = 0 
+			doi_tmp = gsub(".*doi.org/*|*[\"|<].*", '',thepage)
+			if( nchar(doi_tmp)>1 & nchar(doi_tmp)< 40) { doi_test = 1}
+			
+			#Filter 2:
+			if ( doi_test != 1){   
+				doi_tmp = gsub(".*DOI\">*|*</a>.*",'',thepage)
+				if( nchar(doi_tmp)>1 & nchar(doi_tmp)< 40) { doi_test = 1}
+			}
+
+			#Filter 3:
+			if ( doi_test != 1){   
+				doi_tmp = gsub(".*DOI: *|*</.*", '',thepage)
+				if( nchar(doi_tmp)>1 & nchar(doi_tmp)< 40) { doi_test = 1}
+			}
+
+			#Filter 4:
+			if ( doi_test != 1){   
+				doi_tmp = gsub(".*doi.org/*|*[ ].*", '',thepage)
+				if( nchar(doi_tmp)>1 & nchar(doi_tmp)< 40) { doi_test = 1}
+			}
+
+			if(nchar(doi_tmp)<4) { test2 = FALSE}
+
+
 			if(test2 == TRUE){ 
-				doi_tmp = gsub(".*doi.org/*|*[\"|<].*", '',thepage)
+				#doi_tmp = gsub(".*doi.org/*|*[\"|<].*", '',thepage)
 				#Get the citation: 
 				cit1= cr_cn(doi_tmp,format="citeproc-json")
 
