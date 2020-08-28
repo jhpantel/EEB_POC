@@ -218,32 +218,42 @@ for (n in 1:nt) {
 					ta = cit1$title
 
 					#Get the Publication
-					if(exists("container-title", where = cit1) ){
-						pa =  cit1$"container-title"} else {
+					if(exists("container-title", where = cit1)) {
+						if(length(cit1$"container-title")>0){ 
+						pa =  cit1$"container-title"}else{ 
+						pa="NA"} } else {
 						pa="NA"
 					}
 
 					#Get the Volume
 					if(exists("volume", where = cit1) ){
+						if(length(cit1$"volume")>0){ 
 						va = cit1$volume}else{ 
+						va="NA"}}else{ 
 						va ="NA"
 					}
 
 					#Get the Number
 					if(exists("issue", where = cit1) ){
-						num = cit1$issue}else{
+						if(length(cit1$"issue")>0){ 
+						num = cit1$issue}else{ 
+						num="NA"}}else{
 						num="NA"
 					}
 
 					#Get the Pages
 					if(exists("pages", where = cit1) ){ 
-						pgs = cit1$page}else{
+						if(length(cit1$"pages")>0){ 
+						pgs = cit1$page}else{ 
+						pgs="NA"} }else{
 						pgs="NA"
 					}
 
 					#Get the Year
 					if(exists("indexed", where = cit1) ){
-						ya = cit1$indexed[[1]][1]}else{
+						if(length(cit1$"indexed")>0){ 
+						ya = cit1$indexed[[1]][1]}else{ 
+						ya="NA"}}else{
 						ya="NA"
 					}
 					
