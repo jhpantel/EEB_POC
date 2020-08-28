@@ -113,18 +113,23 @@ for (n in 1:nt) {
 
 		cit1 = NULL #Citation variable
 		t1 = grep("https:", eb1$text[n],value = TRUE) #Get the tweet
-		#Extract address. This is done in 2 steps due to prevalance of tiny
+		#Extract address. This is done in 2 steps due to prevalance of tiny-
 		#esque URLs. 
-		#page1 = paste("https:", sub(".*https:","",t1),sep="") 
+
+		#Old regex attempts:
+		# page1 = paste("https:", sub(".*https:","",t1),sep="") 
 		# page1 = paste("https:", sub("\n|@| |)|. .*","",sub(".*https:","",t1)),sep="" )
 		# page1 = paste("https:", sub("[\n|@| |)].*","",sub(".*https:","",t1)),sep="" )
+		
+		#Currently the best regex filter: 
 		page1 =paste("https:", gsub(".*https:*|*\n|@| |)| .*", '',t1),sep="" ) 
 		page1_u= decode.short.url(page1)
 		
-		###Old attempts
+		#Old attempts at getting the page:
 		#thepage_tmp = getURL(page1_u) 
 		#thepage = GET(page1_u,timeout(20)) %>% content("text")
 
+		#Currently the best attempt: 
 		#Think about using nodes with html_nodes("span") to make this easier? 
 		test_url1= try(read_html(page1_u), silent=TRUE)
 		if(class(test_url1) != 'try-error' ){ 
@@ -141,23 +146,7 @@ for (n in 1:nt) {
 				thepage = ("Failure to get page")
 			}
 		}
-		#Throw in a test to see if this is another redirect link: 
-
-		# test1 = grepl("oved", thepage_tmp) | grepl("edirect", thepage_tmp)
-		# #But if this is a whole webpage, set it back to false: 
-		# #if(grepl("<!DOCTYPE html>",thepage_tmp) ) {test1 = FALSE }
-
-		# if(test1 == TRUE) {
-		# 	page1_u=paste("https:",sub("\\\".*","",sub(".*https:","",thepage_tmp)),sep="") 
-		# 	#Test the page validity: 
-		# 	page_test = try(getURL(page1_u),silent=TRUE)
-		# 	if(class(page_test) != 'try-error'){ 
-		# 		thepage = getURL(page1_u) 
-		# 	}
-		
-		# }else { 
-		# 	thepage = thepage_tmp
-		# }
+	
 
 		#Download the page HTML 
 		page_test = try(getURL(page1_u),silent=TRUE)
@@ -247,12 +236,13 @@ for (n in 1:nt) {
 					ka = "0"
 
 					#Get the ORCID
-					if(is.na(cit1$author$ORCID[[1]]) ){  
-						oa = "NA"
-					}else { 
-						oa = sub(".*orcid.org/",'', x=cit1$author$ORCID[[1]])
+					if(exists("ORCID", where = cit1$author) ){
+						if(is.na(cit1$author$ORCID[[1]]) ){  
+							oa = "NA"
+						}else { 
+							oa = sub(".*orcid.org/",'', x=cit1$author$ORCID[[1]])
+						}
 					}
-				
 					#Get the DOI
 					da = cit1$DOI
 					print(paste(n,da,sep =" ") )
