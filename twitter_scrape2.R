@@ -116,7 +116,9 @@ for (n in 1:nt) {
 		#Extract address. This is done in 2 steps due to prevalance of tiny
 		#esque URLs. 
 		#page1 = paste("https:", sub(".*https:","",t1),sep="") 
-		page1 = paste("https:", sub("[\n|@| |)].*","",sub(".*https:","",t1)),sep="" )
+		# page1 = paste("https:", sub("\n|@| |)|. .*","",sub(".*https:","",t1)),sep="" )
+		# page1 = paste("https:", sub("[\n|@| |)].*","",sub(".*https:","",t1)),sep="" )
+		page1 =gsub(".$","",paste("https:", gsub(".*https:*|*\n|@| |)| .*", '',t1),sep="" ) )
 		page1_u= decode.short.url(page1)
 		
 		###Old attempts
