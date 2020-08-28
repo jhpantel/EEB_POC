@@ -218,19 +218,34 @@ for (n in 1:nt) {
 					ta = cit1$title
 
 					#Get the Publication
-					pa =  cit1$"container-title"
+					if(exists("container-title", where = cit1) ){
+						pa =  cit1$"container-title"} else {
+						pa="NA"
+					}
 
 					#Get the Volume
-					va = cit1$volume
+					if(exists("volume", where = cit1) ){
+						va = cit1$volume}else{ 
+						va ="NA"
+					}
 
 					#Get the Number
-					num = cit1$issue
+					if(exists("issue", where = cit1) ){
+						num = cit1$issue}else{
+						num="NA"
+					}
 
-					#Get the Pages 
-					pgs = cit1$page
+					#Get the Pages
+					if(exists("pages", where = cit1) ){ 
+						pgs = cit1$page}else{
+						pgs="NA"
+					}
 
 					#Get the Year
-					ya = cit1$indexed[[1]][1]
+					if(exists("indexed", where = cit1) ){
+						ya = cit1$indexed[[1]][1]}else{
+						ya="NA"
+					}
 					
 					#Get the Keywords
 					ka = "0"
