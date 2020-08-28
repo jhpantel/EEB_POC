@@ -257,6 +257,8 @@ for (n in 1:nt) {
 						}else { 
 							oa = sub(".*orcid.org/",'', x=cit1$author$ORCID[[1]])
 						}
+					}else{ 
+						oa = "NA"
 					}
 					#Get the DOI
 					da = cit1$DOI
