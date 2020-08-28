@@ -96,7 +96,7 @@ get_token()
 #	DOI
 #
 #=============================================================================
-eb1 = get_timeline("EEB_POC",n=20)
+eb1 = get_timeline("EEB_POC")
 
 #Search tweets for HTMLs that could lead to papers: 
 nt = dim(eb1)[1]
@@ -116,12 +116,25 @@ for (n in 1:nt) {
 		#Extract address. This is done in 2 steps due to prevalance of tiny
 		#esque URLs. 
 		#page1 = paste("https:", sub(".*https:","",t1),sep="") 
-		page1 = paste("https:", sub("[\n|@| ].*","",sub(".*https:","",t1)),sep="" )
+		page1 = paste("https:", sub("[\n|@| |)].*","",sub(".*https:","",t1)),sep="" )
 		page1_u= decode.short.url(page1)
 		#thepage_tmp = getURL(page1_u) 
 		#thepage = GET(page1_u,timeout(20)) %>% content("text")
-		thepage = html_text(read_html(page1_u) )
-
+		test_url1= try(read_html(page1_u), silent=TRUE)
+		if(class(test_url1) != 'try-error' ){ 
+			thepage = html_text(read_html(page1_u ) )
+		} else{
+			#Basically, read_html fails sometimes for unknown reasons. 
+			#Try a different fuction -- in this case GET -- to retrieve
+			#the HTML. Then if that fails, give up. 
+			test_url2= try(GET(page1_u,timeout(20)), silent=TRUE)
+			
+			if(class(test_url2) != 'try-error' ){ 
+				thepage = GET(page1_u,timeout(20)) %>% content("text")
+			}else{    
+				thepage = ("Failure to get page")
+			}
+		}
 		#Throw in a test to see if this is another redirect link: 
 
 		# test1 = grepl("oved", thepage_tmp) | grepl("edirect", thepage_tmp)
@@ -145,7 +158,7 @@ for (n in 1:nt) {
 		#Check to make sure it is of a type that will work: 
 	 	if(class(page_test) != 'try-error'){ 
 			#Look for a DOI: 
-			test2 = grepl("doi",thepage)
+			test2 = grepl("doi",thepage,ignore.case = TRUE)
 			
 			if(test2 == TRUE){ 
 
@@ -156,7 +169,7 @@ for (n in 1:nt) {
 
 				#Filter 1: 
 				doi_test = 0 
-				doi_tmp = gsub(".*doi.org/*|*\"|</|\\n|\\r.*", '',thepage)
+				doi_tmp = gsub(".*doi.org/*|*\"|</|\\n|\\r| |  |Key.*", '',thepage)
 				if( nchar(doi_tmp)>1 & nchar(doi_tmp)< 40) { doi_test = 1}
 				
 				#Filter 2:
@@ -167,18 +180,19 @@ for (n in 1:nt) {
 
 				#Filter 3:
 				if ( doi_test != 1){   
-					doi_tmp = gsub(".*DOI: *|*</.*", '',thepage)
+					doi_tmp = gsub(".*DOI: *|*</|\\n|\n|\n\n.*", '',thepage)
 					if( nchar(doi_tmp)>1 & nchar(doi_tmp)< 40) { doi_test = 1}
 				}
 
 				#Filter 4:
 				if ( doi_test != 1){   
-					doi_tmp = gsub(".*doi.org/*|*[ ].*", '',thepage)
+					doi_tmp = gsub(".*doi.org/*|* |</a.*", '',thepage)
 					if( nchar(doi_tmp)>1 & nchar(doi_tmp)< 40) { doi_test = 1}
 				}
 
+				if(doi_test == 1 ) { test3=TRUE} else {test3=FALSE}
 				if(nchar(doi_tmp)<4 | grepl("/",doi_tmp) ==FALSE ) { test3 = FALSE}
-				if(try(cr_cn(doi_tmp,format="citeproc-json"),silent=TRUE)==NULL){ test3= FALSE}
+				if(is.null(try(cr_cn(doi_tmp,format="citeproc-json"),silent=TRUE))){ test3= FALSE}
 
 				if(test3 == TRUE){ 
 					#doi_tmp = gsub(".*doi.org/*|*[\"|<].*", '',thepage)
@@ -219,7 +233,7 @@ for (n in 1:nt) {
 					
 					#Get the DOI
 					da = cit1$DOI
-					print(da)
+					print(paste(n,da,sep =" ") )
 					#Put these all in the list: 
 					new_papers[[n_index]] = c( Authors=list(a_s), Title = list(ta), 
 						Publication = list(pa), Volume = list(va), Number = list(num),
@@ -250,5 +264,6 @@ new_csv_df =data.frame(matrix(unlist(new_papers), nrow=nrows, byrow=T),stringsAs
 csv_names = c("Authors", "Title", "Publcation", "Volume", "Number", "Pages", "Year",
 	"Keywords", "ORCID (lead author)", "DOI")
 colnames(new_csv_df) = csv_names
-write.table(new_csv_df, paste(file_name), sep = "\t", col.names = !file.exists(paste(file_name)), append = T)
+write.table(new_csv_df, paste(file_name), sep = "\t", col.names = !file.exists(paste(file_name)), 
+	append = T,row.names = FALSE)
 
