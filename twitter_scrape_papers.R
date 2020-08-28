@@ -312,7 +312,7 @@ for (n in 1:nt) {
 file_name = "./database/EEB_POC_database.csv"
 nrows = length(new_papers)
 new_csv_df =data.frame(matrix(unlist(new_papers), nrow=nrows, byrow=T),stringsAsFactors=FALSE)
-csv_names = c("Authors", "Title", "Publcation", "Volume", "Number", "Pages", "Year",
+csv_names = c("Authors", "Title", "Publication", "Volume", "Number", "Pages", "Year",
 	"Keywords", "ORCID (lead author)", "DOI")
 colnames(new_csv_df) = csv_names
 write.table(new_csv_df, paste(file_name), sep = "\t", col.names = !file.exists(paste(file_name)), 
