@@ -247,8 +247,12 @@ for (n in 1:nt) {
 					ka = "0"
 
 					#Get the ORCID
-					oa = sub(".*orcid.org/",'', x=cit1$author$ORCID[[1]])
-					
+					if(is.na(cit1$author$ORCID[[1]]) ){  
+						oa = "NA"
+					}else { 
+						oa = sub(".*orcid.org/",'', x=cit1$author$ORCID[[1]])
+					}
+				
 					#Get the DOI
 					da = cit1$DOI
 					print(paste(n,da,sep =" ") )
