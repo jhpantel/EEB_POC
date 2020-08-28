@@ -96,7 +96,7 @@ get_token()
 #	DOI
 #
 #=============================================================================
-eb1 = get_timeline("EEB_POC")
+eb1 = get_timeline("EEB_POC",20)
 
 #Search tweets for HTMLs that could lead to papers: 
 nt = dim(eb1)[1]
@@ -118,8 +118,12 @@ for (n in 1:nt) {
 		#page1 = paste("https:", sub(".*https:","",t1),sep="") 
 		page1 = paste("https:", sub("[\n|@| |)].*","",sub(".*https:","",t1)),sep="" )
 		page1_u= decode.short.url(page1)
+		
+		###Old attempts
 		#thepage_tmp = getURL(page1_u) 
 		#thepage = GET(page1_u,timeout(20)) %>% content("text")
+
+		#Think about using nodes with html_nodes("span") to make this easier? 
 		test_url1= try(read_html(page1_u), silent=TRUE)
 		if(class(test_url1) != 'try-error' ){ 
 			thepage = html_text(read_html(page1_u ) )
@@ -166,28 +170,34 @@ for (n in 1:nt) {
 				#it if it doesn't conform (i.e. this could be reference within
 				#another kind of webpage). Also try a few different ways of 
 				#filtering it from the html data. 
-
-				#Filter 1: 
-				doi_test = 0 
-				doi_tmp = gsub(".*doi.org/*|*\"|</|\\n|\\r| |  |Key.*", '',thepage)
-				if( nchar(doi_tmp)>1 & nchar(doi_tmp)< 40) { doi_test = 1}
 				
+				#Filter 1: Covers most things
+				doi_test = 0 
+				doi_tmp = gsub(".*doi.org/*|*\"|</|\\n|\\r| |  |Key.*|)|Cit.*| .*", '',thepage)
+				if( nchar(doi_tmp)>6 & nchar(doi_tmp)< 40) { doi_test = 1}
+
 				#Filter 2:
 				if ( doi_test != 1){   
-					doi_tmp = gsub(".*DOI\">*|*</a>.*",'',thepage)
-					if( nchar(doi_tmp)>1 & nchar(doi_tmp)< 40) { doi_test = 1}
+					doi_tmp = gsub(".*doi: *|*</|\\n|\n|\n\n|PMCID:| .*", '',thepage)
+					if( nchar(doi_tmp)>6 & nchar(doi_tmp)< 40) { doi_test = 1}
 				}
-
+				
 				#Filter 3:
 				if ( doi_test != 1){   
-					doi_tmp = gsub(".*DOI: *|*</|\\n|\n|\n\n.*", '',thepage)
-					if( nchar(doi_tmp)>1 & nchar(doi_tmp)< 40) { doi_test = 1}
+					doi_tmp = gsub(".*DOI\">*|*</a>.*",'',thepage)
+					if( nchar(doi_tmp)>6 & nchar(doi_tmp)< 40) { doi_test = 1}
 				}
 
 				#Filter 4:
 				if ( doi_test != 1){   
+					doi_tmp = gsub(".*DOI: *|*</|\\n|\n|\n\n.*", '',thepage)
+					if( nchar(doi_tmp)>6 & nchar(doi_tmp)< 40) { doi_test = 1}
+				}
+
+				#Filter 5:
+				if ( doi_test != 1){   
 					doi_tmp = gsub(".*doi.org/*|* |</a.*", '',thepage)
-					if( nchar(doi_tmp)>1 & nchar(doi_tmp)< 40) { doi_test = 1}
+					if( nchar(doi_tmp)>6 & nchar(doi_tmp)< 40) { doi_test = 1}
 				}
 
 				if(doi_test == 1 ) { test3=TRUE} else {test3=FALSE}
@@ -251,8 +261,14 @@ for (n in 1:nt) {
 	}
 
 
-} #26,27,31,33,37,43,48,71
-
+}
+#Gets: 3,6,8,12,16,17,18,19,
+#Misses:
+#2: Interactive pdf
+#7: Wrong tiny url in tweet?
+#14: Grabs dryad doi?? 
+#15: Link to another tweet? 
+#16: "Citations",19,20
 #=============================================================================
 # All of this information is then stored externally to a (possibly already
 # existing) databse in the form of a tab-delimited CSV file. 
