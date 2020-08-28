@@ -96,7 +96,7 @@ get_token()
 #	DOI
 #
 #=============================================================================
-eb1 = get_timeline("EEB_POC",20)
+eb1 = get_timeline("EEB_POC")
 
 #Search tweets for HTMLs that could lead to papers: 
 nt = dim(eb1)[1]
@@ -173,7 +173,7 @@ for (n in 1:nt) {
 				
 				#Filter 1: Covers most things
 				doi_test = 0 
-				doi_tmp = gsub(".*doi.org/*|*\"|</|\\n|\\r| |  |Key.*|)|Cit.*| .*", '',thepage)
+				doi_tmp = gsub(".*doi.org/*|*\"|</|\\n|\\r| |  |Key.*|)|Cit.*|Pub.*| .*", '',thepage)
 				if( nchar(doi_tmp)>6 & nchar(doi_tmp)< 40) { doi_test = 1}
 
 				#Filter 2:
@@ -200,9 +200,15 @@ for (n in 1:nt) {
 					if( nchar(doi_tmp)>6 & nchar(doi_tmp)< 40) { doi_test = 1}
 				}
 
+				#A final round of tests to make sure this is a feasible DOI
 				if(doi_test == 1 ) { test3=TRUE} else {test3=FALSE}
+				#Could be other random garbage: 
 				if(nchar(doi_tmp)<4 | grepl("/",doi_tmp) ==FALSE ) { test3 = FALSE}
-				if(is.null(try(cr_cn(doi_tmp,format="citeproc-json"),silent=TRUE))){ test3= FALSE}
+				#Try running the link, is it garbage? 
+				if(is.null(try(cr_cn(doi_tmp,format="citeproc-json"),silent=TRUE)) |
+					class(try(
+						cr_cn(doi_tmp,format="citeproc-json"),silent=TRUE))== 
+					'try-error'){ test3= FALSE}
 
 				if(test3 == TRUE){ 
 					#doi_tmp = gsub(".*doi.org/*|*[\"|<].*", '',thepage)
@@ -262,13 +268,16 @@ for (n in 1:nt) {
 
 
 }
-#Gets: 3,6,8,12,16,17,18,19,
+#=============================================================================
+#Known issues: 
+#=============================================================================
+#Fom 1 to 20: 
+#Gets: 3,6,8,12,16,17,18,19,20
 #Misses:
 #2: Interactive pdf
 #7: Wrong tiny url in tweet?
 #14: Grabs dryad doi?? 
 #15: Link to another tweet? 
-#16: "Citations",19,20
 #=============================================================================
 # All of this information is then stored externally to a (possibly already
 # existing) databse in the form of a tab-delimited CSV file. 
