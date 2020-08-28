@@ -118,7 +118,7 @@ for (n in 1:nt) {
 		#page1 = paste("https:", sub(".*https:","",t1),sep="") 
 		# page1 = paste("https:", sub("\n|@| |)|. .*","",sub(".*https:","",t1)),sep="" )
 		# page1 = paste("https:", sub("[\n|@| |)].*","",sub(".*https:","",t1)),sep="" )
-		page1 =gsub(".$","",paste("https:", gsub(".*https:*|*\n|@| |)| .*", '',t1),sep="" ) )
+		page1 =paste("https:", gsub(".*https:*|*\n|@| |)| .*", '',t1),sep="" ) 
 		page1_u= decode.short.url(page1)
 		
 		###Old attempts
@@ -257,6 +257,9 @@ for (n in 1:nt) {
 						Publication = list(pa), Volume = list(va), Number = list(num),
 						Pages = list(pgs), Year = list(ya), Keywords=list(ka), 
 						"ORCID (lead author)" = oa, DOI = da  )
+
+					#Replace NULL with 0 to preserve table spacing when converting to csv.
+					new_papers[[n_index]][vapply(new_papers[[n_index]], is.null, NA)] = "NA"
 
 					n_index = n_index+1
 				}
