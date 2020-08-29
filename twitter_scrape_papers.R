@@ -210,7 +210,7 @@ for (n in 1:nt) {
 					numb_a = dim(cit1$author)[1]
 					a_s = NULL
 					for(a in 1:numb_a){
-						a_s = c(a_s, paste(cit1$author$family[a],", ",cit1$author$given[a], sep=" ") )
+						a_s = c(a_s, paste(cit1$author$family[a],", ",cit1$author$given[a], sep="; ") )
 					}
 					a_s = paste(a_s, collapse = '')
 
