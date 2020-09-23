@@ -13,18 +13,7 @@ library(shinyjs)
 library(digest)
 library(tidyr)
 library(rorcid)
-library(scholar)
-
-# Definition of mandatory fields and helper function ---------------------
-
-# Save outputs - setup fields to be tracked
-fieldsAll <- c("input_type", "author_info")
-
-### THIS NEEDS TO BE CHANGED TO GOOGLE SHEETS SYNC
-responsesDir <- file.path("responses")
-epochTime <- function() {
-  as.integer(Sys.time())
-}
+# library(scholar)
 
 # UI ----------------------------------------------------------------------
 shinyApp(
@@ -64,13 +53,55 @@ shinyApp(
         # actionButton("submitall", "Submit all works above"),
         actionButton("submitselected", "Submit selected works")
       )
+    ),
+    tabPanel(title="Researcher Information",
+    sidebarPanel(
+      helpText("The Graduate Diversity Council in the Department of Environmental Science, Policy, & Management at UC Berkeley and a group of collaborators from the Zoology Department at the University of British Columbia are seeking to increase visibility of scholars with underrepresented racial backgrounds in our seminar series, course syllabuses, and citation practices. To that end, we are assembling a list of BIPOC (Black, Indigenous, Person of Color) scholars in fields related to environmental sciences (including natural, social, and/or physical sciences)."),
+      br(),
+      helpText("If you identify as a scholar in environmental sciences from an underrepresented racial or ethnic background, we would love to include you on a list that will be used for future seminar series and revising course syllabuses. Please take a few minutes to fill out this form and share it with others in your network!"),
+      br(),
+      helpText("All fields except your name are optional - please only fill in what you are comfortable being accessible online.")
     )
-  )
   ),
+  mainPanel(
+    column(4, br(),
+      textInput("name", label = "Name"),
+      textInput("institution", label = "Affiliated institution"),
+      textInput("email", label = "Email address (will be anonymized?)"),
+      textInput("site", label = "Affiliatedilliated website (may include lab/department page or personal page)"),
+      textInput("country", label = "Country of current residence"),
+      textInput("scholar", label = "Google Scholar or other research page (ORCID entry possible on the next tab)"),
+      textInput("twitter", label = "Twitter handle")
+  ),
+  column(4,br(),
+    selectizeInput("careerstage", label = "Career stage", choices = c("", "Graduate student", "Post-doctoral Scholar", "Research Scientist", 'Pre-Tenure Faculty', "Post-Tenure Faculty", "Emeritus Faculty")),
+    selectizeInput("gender", label = "Gender", choices = c("", "Nonbinary", "Female", "Male", "Prefer not to say", "Prefer another identity (indicate below)")),
+    textInput("another_gender", label = "Preferred identity"),
+    selectInput("bipoc", label = "Do you identify as a BIPOC (Black, Indigenous, Person of Color) scholar?", choices = c("", "Yes", "No")),
+    textInput("bipoc_specify", label = "Underpresented racial/ethnic minotirty identity"),
+    selectInput("disability", label = "Do you identify as a person with a disability?", choices = c("", "Yes", "No")),
+    selectInput("other_underrep", label = "Do you identify as an other underrepresented group not listed above? (e.g. LGBTQ+, First Generation College, or others)", choices = c("", "Yes", "No")),
+    textInput("other_specify", label = "Feel free to specify here:")
+  ),
+  column(4, br(),
+    selectInput("subdisc", label = "Subdiscipline", choices = c("", "Biogeochemistry","Entomology","Evolutionary Biology","Food Systems & Agroecology","Forestry","Freshwater Ecology","Political Ecology","Sustainability Studies","Wildlife Ecology","Conservation Science","Environmental Social Sciences","Other...")),
+    textInput("disc_specify", label = "Please specify your subdiscipline"),
+    textInput("keywords", label = "Please provide keywords for your research, separated with a semicolon (;)"),
+    textInput("refers", label = "Please provide the names of other BIPOC scholars in your fiend that you would recommend we reach out to.")
+  )
+)
+)
+),
+
   server = function(input, output, session) {
     show_modal_spinner()
     # Initially disable/hide some buttons
     ### shinyjs::hide("input_type")
+    shinyjs::hide("another_gender")
+    shinyjs::hide("bipoc_specify")
+    shinyjs::hide("other_specify")
+    shinyjs::hide("disc_specify")
+
     shinyjs::hide("ui_input_text")
     shinyjs::hide("restart_prompt")
     shinyjs::hide("authsearch")
@@ -103,6 +134,35 @@ shinyApp(
           return(substr(i,gregexpr(pattern = "_",i)[[1]]+1,nchar(i)))
         }
       })))
+    })
+    # "Other" boxes appearances controlled here
+    observeEvent(input$gender, {
+      if(input$gender == "Prefer another identity (indicate below)"){
+        shinyjs::show("another_gender")
+      } else {
+        shinyjs::hide("another_gender")
+      }
+    })
+    observeEvent(input$bipoc, {
+      if(input$bipoc == "Yes"){
+        shinyjs::show("bipoc_specify")
+      } else {
+        shinyjs::hide("bipoc_specify")
+      }
+    })
+    observeEvent(input$other_underrep, {
+      if(input$other_underrep == "Yes"){
+        shinyjs::show("other_specify")
+      } else {
+        shinyjs::hide("other_specify")
+      }
+    })
+    observeEvent(input$subdisc, {
+      if(input$subdisc == "Other..."){
+        shinyjs::show("disc_specify")
+      } else {
+        shinyjs::hide("disc_specify")
+      }
     })
 
     # Save inputs
@@ -200,7 +260,7 @@ shinyApp(
 
       output$auth_select = renderUI({
         selectInput(
-          inputId = "auth_choice", label = "Which of these search results match you?", choices = c("...choose one...", paste0(given_vec, " ", family_vec, ". ORCID: ", orc_vec, " (alternative names: ", alts_vec, ")")),
+          inputId = "auth_choice", label = "Which of these search results match you?", choices = c("", "...choose one...", paste0(given_vec, " ", family_vec, ". ORCID: ", orc_vec, " (alternative names: ", alts_vec, ")")),
           selected = NULL, multiple = F
         )
       })
