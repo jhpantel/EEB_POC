@@ -25,35 +25,7 @@ shinyApp(
     ),
     tabsetPanel(
       id = "tabs",
-      tabPanel(title="Search for papers using your ORCID",
-      sidebarPanel(
-        helpText("Please select what type of author information you'd like to use for looking up associated works. Then, the app will look up references associated with that identifier."),
-        tags$b("If you have a common name, it is best to input your ORCID directly as the author search does not provide other identifying informtion."),
-        tags$hr(),
-        ### textInput("orcid_token", "[testing only] Please enter your ORCID API Token here:", "NULL"),
-        ### tags$hr(),
-        selectInput("input_type", "I would like to submit author information using my...", c("...choose one..."="","Publishing Name", "ORCID"), ""),
-        uiOutput("ui_input_text"),
-        # textOutput("restart_prompt"),
-        uiOutput("restart_prompt"),
-        ### OLD:
-        ### DT::dataTableOutput("author_select")
-        actionButton("authsearch", "Search for author", icon = icon("address-book"), class = "btn-primary", width = "100%"),
-        tags$hr(),
-        uiOutput("auth_select"),
-        tags$hr(),
-        uiOutput("worksearch_ui")
-      ),
-      mainPanel(
-        # Author selection scroll box, paper selection scroll box
-        DT::DTOutput("works_dt"),
-        checkboxInput("dt_sel", "Select/deselect all"),
-        h4("selected_rows:"),
-        verbatimTextOutput("selected_rows", TRUE),
-        # actionButton("submitall", "Submit all works above"),
-        actionButton("submitselected", "Submit selected works")
-      )
-    ),
+
     tabPanel(title="Researcher Information",
     sidebarPanel(
       helpText("The Graduate Diversity Council in the Department of Environmental Science, Policy, & Management at UC Berkeley and a group of collaborators from the Zoology Department at the University of British Columbia are seeking to increase visibility of scholars with underrepresented racial backgrounds in our seminar series, course syllabuses, and citation practices. To that end, we are assembling a list of BIPOC (Black, Indigenous, Person of Color) scholars in fields related to environmental sciences (including natural, social, and/or physical sciences)."),
@@ -61,8 +33,7 @@ shinyApp(
       helpText("If you identify as a scholar in environmental sciences from an underrepresented racial or ethnic background, we would love to include you on a list that will be used for future seminar series and revising course syllabuses. Please take a few minutes to fill out this form and share it with others in your network!"),
       br(),
       helpText("All fields except your name are optional - please only fill in what you are comfortable being accessible online.")
-    )
-  ),
+    ),
   mainPanel(
     column(4, br(),
       textInput("name", label = "Name"),
@@ -89,6 +60,37 @@ shinyApp(
     textInput("keywords", label = "Please provide keywords for your research, separated with a semicolon (;)"),
     textInput("refers", label = "Please provide the names of other BIPOC scholars in your fiend that you would recommend we reach out to.")
   )
+)
+),
+tabPanel(title="Search for papers using your ORCID",
+sidebarPanel(
+  helpText("Please select what type of author information you'd like to use for looking up associated works. Then, the app will look up references associated with that identifier."),
+  tags$b("If you have a common name, it is best to input your ORCID directly as the author search does not provide other identifying informtion."),
+  tags$hr(),
+  ### textInput("orcid_token", "[testing only] Please enter your ORCID API Token here:", "NULL"),
+  ### tags$hr(),
+  selectInput("input_type", "I would like to submit author information using my...", c("...choose one..."="","Publishing Name", "ORCID"), ""),
+  uiOutput("ui_input_text"),
+  # textOutput("restart_prompt"),
+  uiOutput("restart_prompt"),
+  ### OLD:
+  ### DT::dataTableOutput("author_select")
+  actionButton("authsearch", "Search for author", icon = icon("address-book"), class = "btn-primary", width = "100%"),
+  tags$hr(),
+  uiOutput("auth_select"),
+  tags$hr(),
+  uiOutput("worksearch_ui")
+),
+mainPanel(
+  # Author selection scroll box, paper selection scroll box
+  helpText("When your works appear below, please click on the works you would like be submitted. Click again to remove. Any highlighted works will be submitted to the database."),
+  DT::DTOutput("works_dt"),
+  checkboxInput("dt_sel", "Select/deselect all"),
+  h4("selected_rows:"),
+  verbatimTextOutput("selected_rows", TRUE),
+  # actionButton("submitall", "Submit all works above"),
+  actionButton("submitselected", "Submit selected works")
+)
 )
 )
 ),
