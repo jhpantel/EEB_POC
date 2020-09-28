@@ -39,7 +39,7 @@ shinyApp(
       textInput("name", label = "Name"),
       textInput("institution", label = "Affiliated institution"),
       textInput("email", label = "Email address (will be anonymized?)"),
-      textInput("site", label = "Affiliatedilliated website (may include lab/department page or personal page)"),
+      textInput("site", label = "Affiliated website (may include lab/department page or personal page)"),
       textInput("country", label = "Country of current residence"),
       textInput("scholar", label = "Google Scholar or other research page (ORCID entry possible on the next tab)"),
       textInput("twitter", label = "Twitter handle")
@@ -59,7 +59,8 @@ shinyApp(
     textInput("disc_specify", label = "Please specify your subdiscipline"),
     textInput("keywords", label = "Please provide keywords for your research, separated with a semicolon (;)"),
     textInput("refers", label = "Please provide the names of other BIPOC scholars in your fiend that you would recommend we reach out to.")
-  )
+  ),
+  downloadButton("download", label = "TEMPORARY: Download csv of author information")
 )
 ),
 tabPanel(title="Search for papers using your ORCID",
@@ -81,13 +82,14 @@ sidebarPanel(
   tags$hr(),
   uiOutput("worksearch_ui")
 ),
+
 mainPanel(
   # Author selection scroll box, paper selection scroll box
   helpText("When your works appear below, please click on the works you would like be submitted. Click again to remove. Any highlighted works will be submitted to the database."),
   DT::DTOutput("works_dt"),
   checkboxInput("dt_sel", "Select/deselect all"),
-  h4("selected_rows:"),
-  verbatimTextOutput("selected_rows", TRUE),
+  # h4("selected_rows:"),
+  # verbatimTextOutput("selected_rows", TRUE),
   # actionButton("submitall", "Submit all works above"),
   actionButton("submitselected", "Submit selected works")
 )
@@ -113,7 +115,40 @@ mainPanel(
     shinyjs::hide("selected_rows")
     shinyjs::hide("submitselected")
     remove_modal_spinner()
-    # Global variable
+    # Global variable: author info
+
+    author_df <- reactive({data.frame(
+      name = input$name,
+      institution = input$institution,
+      email = input$email,
+      site = input$site,
+      country = input$country,
+      scholar = input$scholar,
+      twitter = input$twitter,
+      careerstage = input$careerstage,
+      gender = input$gender,
+      another_gender = input$another_gender,
+      bipoc = input$bipoc,
+      bipoc_specify = input$bipoc_specify,
+      disability = input$disability,
+      other_underrep = input$other_underrep,
+      other_specify = input$other_specify,
+      subdisc = input$subdisc,
+      disc_specify = input$disc_specify,
+      keywords = input$keywords,
+      refers = input$refers,
+      upload_date = Sys.Date())
+    })
+    # Download author data
+    output$download <- downloadHandler(
+    filename = function() {
+      paste("authordata-", Sys.Date(), ".csv", sep="")
+    },
+    content = function(file) {
+      write.csv(author_df(), file)
+    }
+  )
+
     author_dt <<- data.frame("Given name" = "",
                              "Family name" = "",
                              "ORCID" = "",
@@ -190,7 +225,11 @@ mainPanel(
       if(input$input_type == "ORCID"){
 #        shinyjs::enable("author_info")
         shinyjs::show("ui_input_text")
+        output$worksearch_ui <- renderUI({
+          actionButton("worksearch", paste0("Find works by ORCID ", orc_input), icon = icon("search"), class = "btn-primary", width = "100%")
+        })
         shinyjs::show("worksearch_ui")
+        shinyjs::show("worksearch")
         shinyjs::show("author_info")
         shinyjs::hide("authsearch")
         # Create a global variable, orc_input, to be used later
@@ -274,6 +313,7 @@ mainPanel(
         output$worksearch_ui <- renderUI({
           actionButton("worksearch", paste0("Find works by ORCID ", orc_input), icon = icon("search"), class = "btn-primary", width = "100%")
         })
+        shinyjs::show("worksearch")
         shinyjs::show("worksearch_ui")
       }, ignoreInit = T)
         # print(input$auth_choice)
@@ -284,10 +324,11 @@ mainPanel(
         shinyjs::disable("ui_input_text")
         shinyjs::show("dt_sel")
         shinyjs::show("selected_rows")
-        shinyjs::show("submitselected")
         shinyjs::show("restart_prompt")
         show_modal_spinner()
-        q = data.frame(rorcid::orcid_works(orcid = orc_input)[[1]][[1]])
+        q0 = rorcid::orcid_works(orcid = orc_input)
+        cat(length(q0))
+        q <- data.frame(q0[[1]][[1]])
         print(head(q))
         workstable <- q %>%
           dplyr::select("title.title.value",
@@ -360,4 +401,21 @@ mainPanel(
 #        }
 #      })
       output$selected_rows <- renderPrint(print(input$works_dt_rows_selected))
+      observeEvent(input$works_dt_rows_selected, {
+        if(is.null(input$works_dt_rows_selected) || length(input$works_dt_rows_selected) == 0){
+          shinyjs::disable("submitselected")
+      } else {
+        shinyjs::show("submitselected")
+        shinyjs::enable("submitselected")
+      }
+      })
+
+      observeEvent(input$submitselected, {
+        # Read csv
+        # o_csv <- read.csv("../database/EEB_POC_database_v2.csv")
+        # FOR TESTING
+        o_csv <- data.frame()
+        new_df <- rbind(o_csv, prettytable()[input$works_dt_rows_selected,])
+        write.csv(new_df, "../database/EEB_POC_database_TEST.csv")
+      })
 })
