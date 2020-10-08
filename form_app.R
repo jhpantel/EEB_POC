@@ -53,19 +53,24 @@ shinyApp(
       mainPanel(
         # Author selection scroll box, paper selection scroll box
         checkboxInput("dt_sel", "Select/deselect all"),
+        verbatimTextOutput("selected_rows", TRUE),
         DT::DTOutput("works_dt")
       )
       )
     )
   ),
   server = function(input, output, session) {
+    # Create a global variable for printing, rewriting later
+    orc_input <<- NULL
     # Initially disable/hide some buttons
     shinyjs::hide("ui_input_text")
     shinyjs::hide("authsearch")
     shinyjs::hide("worksearch")
+    shinyjs::hide("worksearch_ui")
     # Figure this out #
     shinyjs::hide("dt_sel")
-    shinyjs::disable("dt_sel")
+    shinyjs::hide("selected_rows")
+#    shinyjs::disable("dt_sel")
 
     # Global variable
     author_dt <<- data.frame("Given name" = "",
@@ -84,14 +89,12 @@ shinyApp(
 
     # Implement row selection
     rowSelect <- reactive({
-
       rows=names(input)[grepl(pattern = "srows_",names(input))]
       paste(unlist(lapply(rows,function(i){
         if(input[[i]]==T){
           return(substr(i,gregexpr(pattern = "_",i)[[1]]+1,nchar(i)))
         }
       })))
-
     })
 
     # Save inputs
@@ -105,8 +108,13 @@ shinyApp(
     # If input type selected:
     observeEvent(
       input$input_type, {
+
       if(input$input_type == "ORCID"){
 #        shinyjs::enable("author_info")
+        output$worksearch_ui <<- renderUI({
+          actionButton("worksearch", paste0("Find works by ORCID ", orc_input),
+          icon = icon("search"), class = "btn-primary", width = "100%")
+        })
         shinyjs::show("ui_input_text")
         shinyjs::show("worksearch_ui")
         shinyjs::show("author_info")
@@ -120,61 +128,77 @@ shinyApp(
         shinyjs::show("author_info")
       }
     }, ignoreInit = T)
-
+0000-0002-8843-617X
     # Search box
     output$ui_input_text <- renderUI({
-      textInput("author_info", ifelse(input$input_type == "ORCID", "Enter your ORCID to search for your publications:", "Search the ORCID database for your name, which we will use to search for your publications:"))
+      textInput("author_info", ifelse(input$input_type == "ORCID",
+      "Enter your ORCID to search for your publications:",
+      "Search the ORCID database for your name, which we will use to search for your publications:"))
     })
 
     observeEvent(input$authsearch, {
         show_modal_spinner()
+        shinyjs::hide("worksearch_ui")
         # if(input$authsearch){
         q = rorcid::orcid(query = tolower(input$author_info))
-        o = apply(q[,2], 1, rorcid::as.orcid)
-        orc_vec = c()
-        given_vec = c()
-        family_vec = c()
-        alts_vec = c()
-        for(i in 1:length(o)){
-          orc_tmp = names(o[[i]])
-          given_tmp = o[[i]][[orc_tmp]]$name$`given-names`$value
-          given_tmp = ifelse(is.null(given_tmp), NA, given_tmp)
-          family_tmp = o[[i]][[orc_tmp]]$name$`family-name`$value
-          family_tmp = ifelse(is.null(family_tmp), NA, family_tmp)
-          alts = o[[i]][[orc_tmp]]$`other-names`$`other-name`
-          if(!identical(alts, list())){
-            # Unlist the alternative names, put into parentheses
-            alts_vec = c(alts_vec, paste(o[[i]][[orc_tmp]]$`other-names`$`other-name`$content, collapse = ", "))
-          } else {
-            alts_vec = c(alts_vec, NA)
+        print(length(q))
+        if(length(q)==0){
+          print('if')
+          output$worksearch_ui = renderUI({
+            HTML(paste0("Your name: ", input$author_info, " did not match any ORCID records."))
+          })
+          shinyjs::show("worksearch_ui")
+          remove_modal_spinner()
+        } else {
+          output$worksearch_ui <- renderUI({
+            actionButton("worksearch", paste0("Find works by ORCID ", orc_input),
+            icon = icon("search"), class = "btn-primary", width = "100%")
+          })
+          print('else')
+          o = apply(q[,2], 1, rorcid::as.orcid)
+          orc_vec = c()
+          given_vec = c()
+          family_vec = c()
+          alts_vec = c()
+          for(i in 1:length(o)){
+            orc_tmp = names(o[[i]])
+            given_tmp = o[[i]][[orc_tmp]]$name$`given-names`$value
+            given_tmp = ifelse(is.null(given_tmp), NA, given_tmp)
+            family_tmp = o[[i]][[orc_tmp]]$name$`family-name`$value
+            family_tmp = ifelse(is.null(family_tmp), NA, family_tmp)
+            alts = o[[i]][[orc_tmp]]$`other-names`$`other-name`
+            if(!identical(alts, list())){
+              # Unlist the alternative names, put into parentheses
+              alts_vec = c(alts_vec, paste(o[[i]][[orc_tmp]]$`other-names`$`other-name`$content, collapse = ", "))
+            } else {
+              alts_vec = c(alts_vec, NA)
+            }
+            given_vec = c(given_vec, given_tmp)
+            family_vec = c(family_vec, family_tmp)
+            orc_vec = c(orc_vec, orc_tmp)
           }
-          given_vec = c(given_vec, given_tmp)
-          family_vec = c(family_vec, family_tmp)
-          orc_vec = c(orc_vec, orc_tmp)
-        }
-        author_dt <<- data.frame("Given name" = given_vec,
-          "Family name" = family_vec,
-          "ORCID" = orc_vec,
-          "Alternative names" = alts_vec)
-        # Create display names
-        author_displays <<- paste0(given_vec, " ", family_vec, ". ORCID: ", orc_vec, " (alternative names: ", alts_vec, ")")
-        # print(author_displays)
-        remove_modal_spinner()
+          author_dt <<- data.frame("Given name" = given_vec,
+            "Family name" = family_vec,
+            "ORCID" = orc_vec,
+            "Alternative names" = alts_vec)
+          # Create display names
+          author_displays <<- paste0(given_vec, " ", family_vec, ". ORCID: ", orc_vec, " (alternative names: ", alts_vec, ")")
+          # print(author_displays)
+          remove_modal_spinner()
 
-        output$auth_select = renderUI({
-          selectInput(
-            inputId = "auth_choice", label = "Which of these search results match you?", choices = c("...choose one...", paste0(given_vec, " ", family_vec, ". ORCID: ", orc_vec, " (alternative names: ", alts_vec, ")")),
-            selected = NULL, multiple = F
-          )
-        })
+          output$auth_select = renderUI({
+            selectInput(
+              inputId = "auth_choice", label = "Which of these search results match you?", choices = c("...choose one...", paste0(given_vec, " ", family_vec, ". ORCID: ", orc_vec, " (alternative names: ", alts_vec, ")")),
+              selected = NULL, multiple = F
+            )
+          })
+        }
 
         observeEvent(input$auth_choice, {
+          shinyjs::hide("worksearch_ui")
           choice_idx = which(author_displays == input$auth_choice)
           orc_input <<- author_dt[choice_idx, "ORCID"]
           print(paste0("Input = ", orc_input))
-          output$worksearch_ui <- renderUI({
-            actionButton("worksearch", paste0("Find works by ORCID ", orc_input), icon = icon("search"), class = "btn-primary", width = "100%")
-          })
           shinyjs::show("worksearch_ui")
         }, ignoreInit = T)
         # print(input$auth_choice)
@@ -184,7 +208,9 @@ shinyApp(
       observeEvent(input$worksearch, {
         show_modal_spinner()
         q = data.frame(rorcid::orcid_works(orcid = orc_input)[[1]][[1]])
-        print(head(q))
+        # print(dim(q))
+        # if()
+         #print(head(q))
         workstable <- q %>%
           dplyr::select("title.title.value",
             "publication.date.year.value",
@@ -219,32 +245,44 @@ shinyApp(
                DOI = paste0("<a href='", html_vec, "'>", doi_vec, "</a>"),
                ORCID.Path = path
              )
-        print(nrow(prettytable))
+        shinyjs::show("dt_sel")
+        shinyjs::show("selected_rows")
 
-        output$works_dt <- DT::renderDT({
-          DT::datatable(
-            cbind(
-            `Submit?`=shinyInput(
-              checkboxInput,"srows_",nrow(prettytable),value=NULL,width=1),
-            prettytable),
-            options = list(orderClasses = TRUE,
-              lengthMenu = c(10, 25, 50),
-              pageLength = 10,
-            drawCallback= JS(
-            'function(settings) {
-              Shiny.bindAll(this.api().table().node());}'),
-            dom = 't', searching=TRUE),
-          selection='multiple',escape=F)
+        # print(nrow(prettytable))
+        dat <- reactive({
+          cbind(
+          `Submit?`=shinyInput(
+            checkboxInput,"srows_",nrow(prettytable),value=NULL,width=1),
+          prettytable)
         })
+        print(paste0("NROW: ",nrow(prettytable)))
+        print(dat)
         remove_modal_spinner()
+        output$works_dt <- DT::renderDT(
+          DT::datatable(dat()), # ,
+#          options = list(orderClasses = TRUE,
+#            lengthMenu = c(10, 25, 50),
+#            pageLength = 10,
+#            drawCallback= JS(
+#              'function(settings) {
+#                Shiny.bindAll(this.api().table().node());}'),
+#            dom = 't', searching=TRUE),
+          options = list(selection='multiple',escape=F))
       }, ignoreInit = T)
 
-#      observeEvent(input$dt_sel, {
-#        dt_proxy <<- DT::dataTableProxy("works_dt")
-#        if(isTRUE(input$dt_sel)) {
-#          DT::selectRows(dt_proxy, input$dt_rows_all)
-#        } else {
-#          DT::selectRows(dt_proxy, NULL)
-#        }
-#      })
-})
+      # observeEvent(input$dt_sel, {
+      #   dt_proxy <<- DT::dataTableProxy("works_dt")
+      #   if(isTRUE(input$dt_sel)) {
+      #     DT::selectRows(dt_proxy, input$dt_rows_all)
+      #   } else {
+      #     DT::selectRows(dt_proxy, NULL)
+      #   }
+      # })
+
+      # output$selected_rows <- renderPrint(print(input$dt_rows_selected))
+      rows_selected <- reactive({
+        ids <- NULL
+        ids <- input$works_dt_rows_selected
+        print(prettytable()[ids,])
+      })
+    })
