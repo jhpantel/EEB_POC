@@ -167,22 +167,25 @@ text-decoration:none;
 font-size:9px;
 }
 
-a
-{
-color:#000000;
-text-decoration:none;
+/* unvisited link */
+a:link {
+  color: blue;
 }
 
-a:hover
-{
-color:#000000
-text-decoration:none;
-border-bottom:dotted 2px;
+/* visited link */
+a:visited {
+  color: green;
 }
-a:visited
-{
-color:#000000;
 
+/* mouse over link */
+a:hover {
+  color: darkblue ;
+  text-decoration: underline;
+}
+
+/* selected link */
+a:active {
+  color: darkblue;
 }
 
 
