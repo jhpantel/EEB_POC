@@ -175,7 +175,7 @@ a:link {
 
 /* visited link */
 a:visited {
-  color: green;
+  color: darkblue;
   text-decoration: none;
 }
 
