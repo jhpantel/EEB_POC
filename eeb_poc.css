@@ -170,11 +170,13 @@ font-size:9px;
 /* unvisited link */
 a:link {
   color: blue;
+  text-decoration: none;
 }
 
 /* visited link */
 a:visited {
   color: green;
+  text-decoration: none;
 }
 
 /* mouse over link */
@@ -186,6 +188,7 @@ a:hover {
 /* selected link */
 a:active {
   color: darkblue;
+  text-decoration: underline;
 }
 
 
