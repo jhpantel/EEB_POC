@@ -15,27 +15,27 @@ library(tidyr)
 library(rorcid)
 library(googledrive)
 library(googlesheets4) 
-
+library(shinythemes)
 # library(scholar)
 
 ### SET UP AUTHENTICATION
 # Designate project-specific cache
 #   To be hosted in shinyapps.io designated folder
-options(gargle_oauth_cache = ".cache")
+# options(gargle_oauth_cache = ".cache")
 
 # Run once in an interactive session to create the auth cache.
-drive_auth() 
+# drive_auth() 
 
 # Authorize Google Sheets to use this token
-sheets_auth(token = drive_token())
+# gs4_auth(token = drive_token())
 
 # In subsequent runs, use this cache
 drive_auth(cache = ".cache", email = "eebpocdatabase@gmail.com")
-sheets_auth(token = drive_token())
+gs4_auth(token = drive_token())
 
 # UI ----------------------------------------------------------------------
 shinyApp(
-  ui <- fluidPage(
+  ui <- fluidPage(theme=shinytheme("yeti"),
     shinyjs::useShinyjs(),
     # titlePanel("POC Authors in Ecology, Evolution, and Biological Sciences"),
     tags$div(class = "h2",
@@ -50,11 +50,13 @@ shinyApp(
       br(),
       helpText("If you identify as a scholar in environmental sciences from an underrepresented racial or ethnic background, we would love to include you on a list that will be used for future seminar series and revising course syllabuses. Please take a few minutes to fill out this form and share it with others in your network!"),
       br(),
-      helpText("All fields except your name are optional - please only fill in what you are comfortable being accessible online.")
+      helpText("All fields except your name are optional - please only fill in what you are comfortable being accessible online."),
+      tags$hr(),
+      actionButton("submitauth", label = "Submit author information to our database.", icon = icon("archive"), class = "btn-success", width = "100%")
     ),
   mainPanel(
     column(4, br(),
-      textInput("name", label = "Name"),
+      textInput("name", label = "Name (required)"),
       textInput("institution", label = "Affiliated institution"),
       textInput("email", label = "Email address (will be anonymized?)"),
       textInput("site", label = "Affiliated website (may include lab/department page or personal page)"),
@@ -77,13 +79,7 @@ shinyApp(
     textInput("disc_specify", label = "Please specify your subdiscipline"),
     textInput("keywords", label = "Please provide keywords for your research, separated with a semicolon (;)"),
     textInput("refers", label = "Please provide the names of other BIPOC scholars in your field that you would recommend we reach out to.")
-  ),
-  
-  
-  
-  actionButton("submitauth", label = "Submit author information to our database. All fields will be publically visible.")
-  
-  
+  ) 
   
 )
 ),
@@ -94,7 +90,7 @@ sidebarPanel(
   tags$hr(),
   ### textInput("orcid_token", "[testing only] Please enter your ORCID API Token here:", "NULL"),
   ### tags$hr(),
-  selectInput("input_type", "I would like to submit author information using my...", c("...choose one..."="","Publishing Name", "ORCID"), ""),
+  selectInput("input_type", "I would like to submit author information using my...", c("...choose one..."="NULL","Publishing Name", "ORCID"), selected = NULL),
   uiOutput("ui_input_text"),
   # textOutput("restart_prompt"),
   uiOutput("restart_prompt"),
@@ -104,18 +100,22 @@ sidebarPanel(
   tags$hr(),
   uiOutput("auth_select"),
   tags$hr(),
-  uiOutput("worksearch_ui")
+  uiOutput("worksearch_ui"),
+  tags$hr(),
+  actionButton("submitselected", "Submit selected works", icon = icon("archive-fill"), class = "btn-success", width = "100%")
 ),
 
 mainPanel(
+  uiOutput("orcid_search_error"), 
+  uiOutput("orcid_search_empty"),
+  uiOutput("orcid_search_restart"), 
   # Author selection scroll box, paper selection scroll box
   helpText("When your works appear below, please click on the works you would like be submitted. Click again to remove. Any highlighted works will be submitted to the database."),
   DT::DTOutput("works_dt"),
-  checkboxInput("dt_sel", "Select/deselect all"),
+  checkboxInput("dt_sel", "Select/deselect all")
   # h4("selected_rows:"),
   # verbatimTextOutput("selected_rows", TRUE),
   # actionButton("submitall", "Submit all works above"),
-  actionButton("submitselected", "Submit selected works")
 )
 )
 )
@@ -129,22 +129,31 @@ mainPanel(
     shinyjs::hide("bipoc_specify")
     shinyjs::hide("other_specify")
     shinyjs::hide("disc_specify")
-
     shinyjs::hide("ui_input_text")
     shinyjs::hide("restart_prompt")
+    shinyjs::hide("orcid_search_error")
+    shinyjs::hide("orcid_search_empty")
+    shinyjs::hide("orcid_search_restart")
     shinyjs::hide("authsearch")
     shinyjs::hide("worksearch")
-    # Figure this out?
     shinyjs::hide("dt_sel")
     shinyjs::hide("selected_rows")
     shinyjs::hide("submitselected")
+    shinyjs::hide("submitauth")
     remove_modal_spinner()
-    # Global variable: author info
-
+    
+    # Only show the "submit author info" button if Name =/= empty
+    observeEvent(input$name, {
+        shinyjs::hide("submitauth")
+        if(input$name != ""){
+            shinyjs::show("submitauth")
+        }
+    })
+    
     author_df <- reactive({data.frame(
       name = input$name,
       institution = input$institution,
-      email = input$email,
+      email = gsub("@", "[at]", input$email),
       site = input$site,
       country = input$country,
       scholar = input$scholar,
@@ -160,17 +169,18 @@ mainPanel(
       disc_specify = input$disc_specify,
       keywords = input$keywords,
       refers = input$refers,
-      upload_date = Sys.Date())
+      upload_date = strptime(Sys.time(), "%m/%d/%y %H:%M:%S")
+      )
     })
-    
-    
     
     # Download author data
     observeEvent(input$submitauth, {
+        show_modal_spinner()
         # Get the Google Drive sheet
         wb <- drive_get("nov10_shinytest_authors")
-        sheets_append(author_df, wb)
-        shinyjs::disable(input$submitauth)
+        sheet_append(ss=wb, data=author_df(), sheet=1)
+        shinyjs::disable("submitauth")
+        remove_modal_spinner()
     })
   
     # Brief data frame for author info on ORCID page
@@ -272,6 +282,18 @@ mainPanel(
     output$restart_prompt <- renderUI(HTML(paste0(
       em("Please restart the page to search for a new author name/ORCID.")
     )))
+    
+    output$orcid_search_error <- renderUI(HTML(paste0(
+      h2("ORCID Lookup Error! See server logs for more details. Please restart the page and try again.")
+    )))
+    
+    output$orcid_search_error <- renderUI(HTML(paste0(
+      h2("ORCID Lookup Error! Search returned zero results. This may be an error with the lookup terms or with the software. Please restart the page and try again.")
+    )))
+    
+    output$orcid_search_restart <- renderUI(HTML(paste0(
+      h3("If the error persists, reach out to us at eebpocdatabase[at]gmail.com.")
+    )))
 
     # Search box
     output$ui_input_text <- renderUI({
@@ -351,37 +373,38 @@ mainPanel(
         shinyjs::show("selected_rows")
         shinyjs::show("restart_prompt")
         show_modal_spinner()
-        q0 = rorcid::orcid_works(orcid = orc_input)
-        cat(length(q0))
-        q <- data.frame(q0[[1]][[1]])
-        print(head(q))
-        workstable <- q %>%
-          dplyr::select("title.title.value",
-            "publication.date.year.value",
-            "publication.date.day.value",
-            "publication.date.month.value",
-            "journal.title.value",
-            "external.ids.external.id",
-            "path")
-
-        doi_fetcher <- q$`external.ids.external.id`
-
-        doi_vec <- c()
-        html_vec <- c()
-
-        for(d in doi_fetcher){
-          rowidx <- which(d$`external-id-type` == "doi")
-          doi_tmp <- d$`external-id-value`[rowidx]
-          if(!identical(rowidx, integer(0))){
-            doi_vec <- c(doi_vec, doi_tmp)
-            html_vec <- c(html_vec, paste0("https://doi.org/", doi_tmp))
-          } else {
-            doi_vec <- c(doi_vec, "No DOI found")
-            html_vec <- c(html_vec, NULL)
-          }
+        # Try-catch for ORCID searching
+        tryCatch({
+            message(paste0("...searching for ORCID with ", orc_input))
+            q0 <- rorcid::orcid_works(orcid = orc_input, warn=FALSE)
+            
+            q <- data.frame(q0[[1]][[1]])
+            print(head(q))
+            workstable <<- q %>%
+              dplyr::select("title.title.value",
+                "publication.date.year.value",
+                "publication.date.day.value",
+                "publication.date.month.value",
+                "journal.title.value",
+                "external.ids.external.id",
+                "path")
+    
+            doi_fetcher <- q$`external.ids.external.id`
+            doi_vec <- c()
+            html_vec <- c()
+            for(d in doi_fetcher){
+                rowidx <- which(d$`external-id-type` == "doi")
+                doi_tmp <- d$`external-id-value`[rowidx]
+            if(!identical(rowidx, integer(0))){
+                doi_vec <- c(doi_vec, doi_tmp)
+                html_vec <- c(html_vec, paste0("https://doi.org/", doi_tmp))
+            } else {
+                doi_vec <- c(doi_vec, "No DOI found")
+                html_vec <- c(html_vec, NULL)
+            }
         }
-
-        prettytable <- reactive({DT::datatable(workstable %>%
+        
+        prettytable <<- reactive({DT::datatable(workstable %>%
             dplyr::transmute(Title = title.title.value,
                Journal = journal.title.value,
                Year = publication.date.year.value,
@@ -389,23 +412,22 @@ mainPanel(
                DOI = paste0("<a href='", html_vec, "'>", doi_vec, "</a>"),
                ORCID.Path = path
              ))})
-        print(nrow(prettytable))
-
         output$works_dt <- DT::renderDT(
-          #DT::datatable(
-#            cbind(
-#            `Submit?`=shinyInput(checkboxInput,"srows_",nrow(prettytable),value=NULL,width=1),
             prettytable(), server = T)
-#            options = list(orderClasses = TRUE,
-#              lengthMenu = c(10, 25, 50),
-#              pageLength = 10,
-#            drawCallback= JS(
-#            'function(settings) {
-#              Shiny.bindAll(this.api().table().node());}'),
-#            dom = 't', searching=TRUE),
-#          selection='multiple',escape=F)
-#        )
-        remove_modal_spinner()
+            remove_modal_spinner()
+        }, error=function(cond){
+            message(paste("Error in search:"))
+            message(cond)
+            shinyjs::show("orcid_search_error")
+            shinyjs::show("orcid_search_restart")
+            shinyjs::disable("worksearch")
+            return(NULL)
+        }, warning=function(cond){
+            message(paste("Warning in search:"))
+            message(cond)
+            return(NULL)
+        }
+        )
       }, ignoreInit = T)
 
       dt_proxy <- DT::dataTableProxy("works_dt")
@@ -417,14 +439,6 @@ mainPanel(
         }
       })
 
-#      observeEvent(input$dt_sel, {
-#        dt_proxy <<- DT::dataTableProxy("works_dt")
-#        if(isTRUE(input$dt_sel)) {
-#          DT::selectRows(dt_proxy, input$dt_rows_all)
-#        } else {
-#          DT::selectRows(dt_proxy, NULL)
-#        }
-#      })
       output$selected_rows <- renderPrint(print(input$works_dt_rows_selected))
       
       observeEvent(input$works_dt_rows_selected, {
@@ -437,9 +451,14 @@ mainPanel(
       })
 
       observeEvent(input$submitselected, {
+        # cat(data.frame(workstable))
+        message(class(workstable))
+        message(data.frame(workstable)[1,])
+        show_modal_spinner()
         # Get the Google Drive sheet
         wb <- drive_get("nov10_shinytest_works")
-        sheets_append(prettytable()[input$works_dt_rows_selected,], wb)
-        shinyjs::disable(input$submitselected)
+        sheet_append(ss=wb, data=data.frame(workstable)[input$works_dt_rows_selected,], sheet=1)
+        shinyjs::disable("submitselected")
+        remove_modal_spinner()
     })
 })
