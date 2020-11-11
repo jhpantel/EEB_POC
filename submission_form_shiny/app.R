@@ -13,6 +13,8 @@ library(shinyjs)
 library(digest)
 library(tidyr)
 library(rorcid)
+library(googlesheets)
+
 # library(scholar)
 
 # UI ----------------------------------------------------------------------
@@ -58,9 +60,15 @@ shinyApp(
     selectInput("subdisc", label = "Subdiscipline", choices = c("", "Biogeochemistry","Entomology","Evolutionary Biology","Food Systems & Agroecology","Forestry","Freshwater Ecology","Political Ecology","Sustainability Studies","Wildlife Ecology","Conservation Science","Environmental Social Sciences","Other...")),
     textInput("disc_specify", label = "Please specify your subdiscipline"),
     textInput("keywords", label = "Please provide keywords for your research, separated with a semicolon (;)"),
-    textInput("refers", label = "Please provide the names of other BIPOC scholars in your fiend that you would recommend we reach out to.")
+    textInput("refers", label = "Please provide the names of other BIPOC scholars in your field that you would recommend we reach out to.")
   ),
-  downloadButton("download", label = "TEMPORARY: Download csv of author information")
+  
+  
+  
+  actionButton("submitauth", label = "Submit author information to our database. All fields will be publically visible.")
+  
+  
+  
 )
 ),
 tabPanel(title="Search for papers using your ORCID",
@@ -139,6 +147,9 @@ mainPanel(
       refers = input$refers,
       upload_date = Sys.Date())
     })
+    
+    
+    
     # Download author data
     output$download <- downloadHandler(
     filename = function() {
@@ -148,6 +159,9 @@ mainPanel(
       write.csv(author_df(), file)
     }
   )
+  
+  
+  
 
     author_dt <<- data.frame("Given name" = "",
                              "Family name" = "",
