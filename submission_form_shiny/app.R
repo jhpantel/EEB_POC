@@ -13,9 +13,25 @@ library(shinyjs)
 library(digest)
 library(tidyr)
 library(rorcid)
-library(googlesheets)
+library(googledrive)
+library(googlesheets4) 
 
 # library(scholar)
+
+### SET UP AUTHENTICATION
+# Designate project-specific cache
+#   To be hosted in shinyapps.io designated folder
+options(gargle_oauth_cache = ".cache")
+
+# Run once in an interactive session to create the auth cache.
+drive_auth() 
+
+# Authorize Google Sheets to use this token
+sheets_auth(token = drive_token())
+
+# In subsequent runs, use this cache
+drive_auth(cache = ".cache", email = "eebpocdatabase@gmail.com")
+sheets_auth(token = drive_token())
 
 # UI ----------------------------------------------------------------------
 shinyApp(
@@ -49,7 +65,7 @@ shinyApp(
   column(4,br(),
     selectizeInput("careerstage", label = "Career stage", choices = c("", "Graduate student", "Post-doctoral Scholar", "Research Scientist", 'Pre-Tenure Faculty', "Post-Tenure Faculty", "Emeritus Faculty")),
     selectizeInput("gender", label = "Gender", choices = c("", "Nonbinary", "Female", "Male", "Prefer not to say", "Prefer another identity (indicate below)")),
-    textInput("another_gender", label = "Preferred identity"),
+    textInput("gender_openended", label = "Preferred identity"),
     selectInput("bipoc", label = "Do you identify as a BIPOC (Black, Indigenous, Person of Color) scholar?", choices = c("", "Yes", "No")),
     textInput("bipoc_specify", label = "Underpresented racial/ethnic minotirty identity"),
     selectInput("disability", label = "Do you identify as a person with a disability?", choices = c("", "Yes", "No")),
@@ -105,11 +121,11 @@ mainPanel(
 )
 ),
 
-  server = function(input, output, session) {
+  server = function(input, output, session){
     show_modal_spinner()
     # Initially disable/hide some buttons
     ### shinyjs::hide("input_type")
-    shinyjs::hide("another_gender")
+    shinyjs::hide("gender_openended")
     shinyjs::hide("bipoc_specify")
     shinyjs::hide("other_specify")
     shinyjs::hide("disc_specify")
@@ -134,8 +150,7 @@ mainPanel(
       scholar = input$scholar,
       twitter = input$twitter,
       careerstage = input$careerstage,
-      gender = input$gender,
-      another_gender = input$another_gender,
+      gender = ifelse(input$gender=="Prefer another identity (indicate below)", input$gender_openended, input$gender),
       bipoc = input$bipoc,
       bipoc_specify = input$bipoc_specify,
       disability = input$disability,
@@ -151,18 +166,14 @@ mainPanel(
     
     
     # Download author data
-    output$download <- downloadHandler(
-    filename = function() {
-      paste("authordata-", Sys.Date(), ".csv", sep="")
-    },
-    content = function(file) {
-      write.csv(author_df(), file)
-    }
-  )
+    observeEvent(input$submitauth, {
+        # Get the Google Drive sheet
+        wb <- drive_get("nov10_shinytest_authors")
+        sheets_append(author_df, wb)
+        shinyjs::disable(input$submitauth)
+    })
   
-  
-  
-
+    # Brief data frame for author info on ORCID page
     author_dt <<- data.frame("Given name" = "",
                              "Family name" = "",
                              "ORCID" = "",
@@ -189,9 +200,9 @@ mainPanel(
     # "Other" boxes appearances controlled here
     observeEvent(input$gender, {
       if(input$gender == "Prefer another identity (indicate below)"){
-        shinyjs::show("another_gender")
+        shinyjs::show("gender_openended")
       } else {
-        shinyjs::hide("another_gender")
+        shinyjs::hide("gender_openended")
       }
     })
     observeEvent(input$bipoc, {
@@ -415,6 +426,7 @@ mainPanel(
 #        }
 #      })
       output$selected_rows <- renderPrint(print(input$works_dt_rows_selected))
+      
       observeEvent(input$works_dt_rows_selected, {
         if(is.null(input$works_dt_rows_selected) || length(input$works_dt_rows_selected) == 0){
           shinyjs::disable("submitselected")
@@ -425,11 +437,9 @@ mainPanel(
       })
 
       observeEvent(input$submitselected, {
-        # Read csv
-        # o_csv <- read.csv("../database/EEB_POC_database_v2.csv")
-        # FOR TESTING
-        o_csv <- data.frame()
-        new_df <- rbind(o_csv, prettytable()[input$works_dt_rows_selected,])
-        write.csv(new_df, "../database/EEB_POC_database_TEST.csv")
-      })
+        # Get the Google Drive sheet
+        wb <- drive_get("nov10_shinytest_works")
+        sheets_append(prettytable()[input$works_dt_rows_selected,], wb)
+        shinyjs::disable(input$submitselected)
+    })
 })
