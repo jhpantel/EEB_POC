@@ -133,13 +133,16 @@ mainPanel(
     shinyjs::hide("disc_specify")
     shinyjs::hide("orcid_lookup")
     shinyjs::hide("submitselected")
+    shinyjs::disable("submitauth")
     shinyjs::hide("dt_sel")
     
     wb <<- googledrive::drive_get("nov10_shinytest_authors")
     # Get a unique fid for that author - first column
-    newid <<- max(
-          na.omit(range_speedread(ss=wb, sheet = 1, range = "Sheet1!A:A")
-        ), 0) + 1
+    newid <<- tryCatch({
+          na.omit(googlesheets4::range_speedread(ss=wb, sheet = 1, range = "Sheet1!A2:A"))+1
+    }, error=function(cond){
+      return(0)
+    })
     remove_modal_spinner()
     message(paste0("ID: ", newid))
     
@@ -190,6 +193,16 @@ mainPanel(
       } else {
         shinyjs::hide("orcid_lookup")
         shinyjs::disable("orcid_nav")
+      }
+    })
+
+    observeEvent(input$name, {
+      if(input$orcid_form!=""){
+#        shinyjs::show("submit_auth")
+        shinyjs::enable("submitauth")
+      } else {
+#        shinyjs::hide("orcid_lookup")
+        shinyjs::disable("submitauth")
       }
     })
 
@@ -350,10 +363,10 @@ mainPanel(
         outtable <- workstable[input$works_dt_rows_selected,] %>%
           dplyr::mutate(submitter_unique_id = newid) %>%
           dplyr::select(submitter_unique_id, everything())
-        wb <- drive_get("nov10_shinytest_works")
+        wb2 <- drive_get("nov10_shinytest_works")
         saveRDS(workstable, "workstable.Rds")
         # googlesheets4::gs4_create("shiny_workstable_output_testy_test", sheets = list(workstable[input$works_dt_rows_selected,]))
-        googlesheets4::sheet_append(data = outtable, ss=wb)
+        googlesheets4::sheet_append(data = outtable, ss=wb2)
         shinyjs::disable("submitselected")
         shinyjs::disable("orcid_nav")
         remove_modal_spinner()
