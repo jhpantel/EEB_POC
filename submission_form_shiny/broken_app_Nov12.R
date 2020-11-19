@@ -1,0 +1,302 @@
+# eeb_poc Shiny server
+# Written by Mairin Deith (mdeith@zoology.ubc.ca)
+# First created June, 2020
+
+# https://deanattali.com/2015/06/14/mimicking-google-form-shiny/
+
+# Load libraries ----------------------------------------------------------
+# devtools::install_github('rstudio/DT')
+library(DT)
+library(shiny)
+library(shinybusy)
+library(shinyjs)
+library(digest)
+library(tidyr)
+library(rorcid)
+library(googledrive)
+library(googlesheets4) 
+library(shinythemes)
+
+### To do - ORCID to first page - lookups there?
+### Link to Google sheet/database here
+
+### SET UP AUTHENTICATION
+# Designate project-specific cache
+#   To be hosted in shinyapps.io designated folder
+# options(gargle_oauth_cache = ".cache")
+
+# Run once in an interactive session to create the auth cache.
+# drive_auth()
+
+# Authorize Google Sheets to use this token
+# gs4_auth(token = drive_token())
+
+# In subsequent runs, use this cache
+drive_auth(cache = ".cache", email = "eebpocdatabase@gmail.com")
+gs4_auth(token = drive_token())
+
+# UI ----------------------------------------------------------------------
+shinyApp(
+  ui <- fluidPage(theme=shinytheme("yeti"),
+    shinyjs::useShinyjs(),
+    tags$div(class = "h1",
+      "POC Authors in BEES* - Submission portal"),  
+    tags$div(class = "h2", "*Behavioural, ecological, evolutionary, and social sciences"),
+
+    sidebarLayout(
+    sidebarPanel(
+      helpText("The Graduate Diversity Council in the Department of Environmental Science, Policy, & Management at UC Berkeley and a group of collaborators from the Zoology Department at the University of British Columbia are seeking to increase visibility of scholars with underrepresented racial backgrounds in our seminar series, course syllabuses, and citation practices. To that end, we are assembling a list of BIPOC (Black, Indigenous, Person of Color) scholars in fields related to environmental sciences (including natural, social, and/or physical sciences)."),
+      br(),
+      helpText("If you identify as a scholar in environmental sciences from an underrepresented racial or ethnic background, we would love to include you on a list that will be used for future seminar series and revising course syllabuses. Please take a few minutes to fill out this form and share it with others in your network!"),
+      br(),
+      helpText("All fields except your name are optional - please only fill in what you are comfortable being accessible online.")
+    ),
+  mainPanel(
+    tags$h3("Scholar information"),
+    column(4, 
+
+      textInput("name", label = "Name (required)"),
+      textInput("email", label = "Email address"),
+      textInput("country", label = "Country of current residence"),
+      textInput("institution", label = "Affiliated institution"),
+      selectizeInput("careerstage", label = "Career stage", choices = c("", "Graduate student", "Post-doctoral Scholar", "Research Scientist", "Pre-Tenure Faculty", "Post-Tenure Faculty", "Emeritus Faculty")),
+      textInput("twitter", label = "Twitter handle"),
+      helpText("We are also interested in highlighting some of your research contributions associated with your ORCID. See below if you would like to also contribute to this database."),
+      textInput("orcid_form", label = "ORCID (format: xxxx-xxxx-xxxx-xxxx)"),
+  ),
+  column(4,
+    textInput("site", label = "Affiliated website (including lab/department webpages or personal webpages)"),
+    textInput("scholar", label = "Google Scholar or other research page"),
+    tags$hr(),
+    selectizeInput("gender", label = "Gender", choices = c("", "Nonbinary", "Female", "Male", "Prefer not to say", "Prefer another identity (indicate below)")),
+    textInput("gender_openended", label = "Preferred identity"),
+    selectInput("bipoc", label = "Do you identify as a BIPOC (Black, Indigenous, Person of Color) scholar?", choices = c("", "Yes", "No")),
+    textInput("bipoc_specify", label = "Underpresented racial/ethnic minotirty identity"),
+    selectInput("disability", label = "Do you identify as a person with a disability?", choices = c("", "Yes", "No")),
+    selectInput("other_underrep", label = "Do you identify as an other underrepresented group not listed above? (e.g. LGBTQ+, First Generation College, or others)", choices = c("", "Yes", "No")),
+    textInput("other_specify", label = "Feel free to specify here:")
+  ),
+  column(4, 
+    selectInput("subdisc", label = "Subdiscipline", choices = c("", "Biogeochemistry","Entomology","Evolutionary Biology","Food Systems & Agroecology","Forestry","Freshwater Ecology","Political Ecology","Sustainability Studies","Wildlife Ecology","Conservation Science","Environmental Social Sciences","Other...")),
+    textInput("disc_specify", label = "Please specify your subdiscipline"),
+    textInput("keywords", label = "Please provide keywords for your research, separated with a semicolon (;)"),
+    helpText("One of the purposes of this database is to connect those looking for more representative speakers at academic events. Our intention is that your time will be compensated for these events; however we cannot ensure that your contact information will be used exclusively by paying hosts."), 
+    selectInput("speaking_ops", label = "Are you open to being contacted for speaking opportunities?", choices = c("", "Yes", "No"), ),
+    textInput("refers", label = "Please provide the names of other BIPOC scholars in your field that you would recommend we reach out to.")
+  ),
+  # Continue in the main panel
+  actionButton("submitauth", label = "Submit author information to our database", icon = icon("archive"), class = "btn-success", width = "100%"),
+  tags$hr(),
+  tags$h4("Use your ORCID (if provided) to lookup research works"),
+  column(6, 
+    actionButton("orcid_lookup", "Find works associated with your ORCID", icon = icon("search"), class = "btn-primary", width = "100%"),
+    uiOutput("orcid_search_error"),
+    uiOutput("orcid_search_restart")
+    ), 
+   column(6,
+     actionButton("submitselected", "Submit selected works", icon = icon("archive"), class = "btn-success", width = "100%"),
+     checkboxInput("dt_sel", "Select/deselect all")
+  ),
+  DT::DTOutput("works_dt")
+) # end main panel
+) # sidebar layout
+),
+
+  server = function(input, output, session){
+    show_modal_spinner(spin = "spring", text = "Connecting to database...")
+    # Setup Google Sheets and global ID parameter
+
+    # Initially disable/hide some buttons
+    ### shinyjs::hide("input_type")
+    shinyjs::hide("gender_openended")
+    shinyjs::hide("bipoc_specify")
+    shinyjs::hide("other_specify")
+    shinyjs::hide("disc_specify")
+    
+    wb <<- googledrive::drive_get("nov10_shinytest_authors")
+    # Get a unique fid for that author - first column
+    newid <<- max(range_speedread(ss=wb, sheet = 1, range = "Sheet1!A:A"))+1
+    remove_modal_spinner()
+    
+    # "Other" boxes appearances controlled here
+    #   If authors choose any field with "indicate below" options, have those
+    #   appear
+    observeEvent(input$gender, {
+      if(input$gender == "Prefer another identity (indicate below)"){
+        shinyjs::show("gender_openended")
+      } else {
+        shinyjs::hide("gender_openended")
+      }
+    })
+    observeEvent(input$bipoc, {
+      if(input$bipoc == "Yes"){
+        shinyjs::show("bipoc_specify")
+      } else {
+        shinyjs::hide("bipoc_specify")
+      }
+    })
+    observeEvent(input$other_underrep, {
+      if(input$other_underrep == "Yes"){
+        shinyjs::show("other_specify")
+      } else {
+        shinyjs::hide("other_specify")
+      }
+    })
+    observeEvent(input$subdisc, {
+      if(input$subdisc == "Other..."){
+        shinyjs::show("disc_specify")
+      } else {
+        shinyjs::hide("disc_specify")
+      }
+    })
+
+    # Submit author data to GSheet
+    observeEvent(input$submitauth, {
+        show_modal_spinner(spin = "spring", "Submitting to Google Sheet database...")
+        # Create a dataframe based on user inputs - this will be saved to the GSheet
+        author_df <- reactive({data.frame(
+            submitter_unique_id = newid,
+            name = input$name,
+            institution = input$institution,
+            email = gsub("@", "[at]", input$email),
+            site = input$site,
+            country = input$country,
+            scholar = input$scholar,
+            orcid = input$orcid_form,
+            twitter = input$twitter,
+            careerstage = input$careerstage,
+            gender = ifelse(input$gender=="Prefer another identity (indicate below)", input$gender_openended, input$gender),
+            bipoc = input$bipoc,
+            bipoc_specify = input$bipoc_specify,
+            disability = input$disability,
+            other_underrep_minority = input$other_underrep,
+            other_underrep_minority_specify = input$other_specify,
+            subdisc = input$subdisc,
+            disc_specify = input$disc_specify,
+            keywords = input$keywords,
+            refers = input$refers,
+            speaking_ops = input$speaking_ops,
+            upload_date = strptime(Sys.time(), "%m/%d/%y %H:%M:%S")
+        )
+    })
+        googlesheets4::sheet_append(ss=wb, data=author_df(), sheet=1)
+        remove_modal_spinner()
+    }, once = T)
+
+    # Only show the "search ORCID" button If an ORCID is provided
+    #   otherwise disable (greyed out)
+    # observeEvent(input$orcid_form, {
+    #    shinyjs::disable("orcid_lookup")
+    #    if(input$orcid_form != ""){
+    #        shinyjs::enable("orcid_lookup")
+    #    }
+    # })
+
+    # Implement row selection
+    rowSelect <- reactive({
+      rows=names(input)[grepl(pattern = "srows_",names(input))]
+      paste(unlist(lapply(rows,function(i){
+        if(input[[i]]==T){
+          return(substr(i,gregexpr(pattern = "_",i)[[1]]+1,nchar(i)))
+        }
+      })))
+    })
+    
+    # When an author has been searched, require a restart.
+    # output$restart_prompt <- renderUI(HTML(paste0(
+    #  em("Please restart the page to search for a new ORCID.")
+    # )))
+            
+    observeEvent(input$orcid_lookup, {
+        shinyjs::disable("submitselected")
+        # "thinking" spinner
+        show_modal_spinner(spin = "spring", text = "Looking up works...")
+        tryCatch({
+            message(paste0("...searching for ORCID: ", input$orcid_form))
+            q0 <- rorcid::orcid_works(orcid = input$orcid_form)
+            # Eval/parse with ID to get the DF of works
+            q <- eval(parse(text=paste0("q0$'", input$orcid_form, "'$works")))
+            workstable <<- q %>%
+              dplyr::select("title.title.value",
+                "publication-date.year.value",
+                "publication-date.day.value",
+                "publication-date.month.value",
+                "journal-title.value",
+                "external-ids.external-id",
+                # "url.value",
+                "path")
+            doi_fetcher <- q$`external-ids.external-id`
+            doi_vec <- c()
+            # html_vec <- c()
+            for(d in doi_fetcher){
+                rowidx <- which(d$`external-id-type` == "doi")
+                doi_tmp <- d$`external-id-value`[rowidx]
+            if(!identical(rowidx, integer(0))){
+                doi_vec <- c(doi_vec, doi_tmp)
+                # html_vec <- c(html_vec, paste0("https://doi.org/", doi_tmp))
+            } else {
+                doi_vec <- c(doi_vec, "No DOI found")
+                # html_vec <- c(html_vec, NULL)
+            }
+          }
+          prettytable <<- DT::datatable(workstable %>%
+            dplyr::transmute(Title = title.title.value,
+              Journal = `journal-title.value`,
+              Year.published = `publication-date.year.value`,
+              Date.published = paste0(tidyr::replace_na(month.abb[as.numeric(`publication-date.month.value`)], ""), " ", tidyr::replace_na(`publication-date.day.value`, "")),
+              DOI = paste0(doi_vec), #, "'>", doi_vec, "</a>"),
+              ORCID.Path = path
+            ))
+          output$works_dt <- DT::renderDT(
+            prettytable)
+          shinyjs::enable("submitselected")
+          remove_modal_spinner()
+        }, error=function(cond){
+            message(paste("Error in search:"))
+            message(cond)
+            output$orcid_search_error <- renderUI(HTML(paste0(
+              h2(paste0("ORCID Lookup Error: '", cond, "'. Please try again."))
+            )))
+            output$orcid_search_restart <- renderUI(HTML(paste0(
+              h3("If the error persists, reach out to us at *** NEED AN UPDATED EMAIL *** eebpocdatabase[at]gmail.com.")
+            )))
+            return(NULL)
+        }, warning=function(cond){
+            message(paste("Warning in search:"))
+            message(cond)
+            return(NULL)
+        }
+        )
+
+      }, ignoreInit = T)
+          
+            
+          dt_proxy <- DT::dataTableProxy("works_dt")
+    
+          observeEvent(input$dt_sel, {
+            if (isTRUE(input$dt_sel)) {
+              DT::selectRows(dt_proxy, input$works_dt_rows_all)
+            } else {
+              DT::selectRows(dt_proxy, NULL)
+            }
+          })
+      shinyjs::enable("submitselected")
+      shinyjs::enable("dt_sel")
+      observeEvent(input$submitselected, {
+        show_modal_spinner(spin = "spring", text = "Submitting to Google Sheets database...")
+        message(class(works_dt))
+        submitted_data <- dt_proxy[input$works_dt_rows_selected,]
+        submitted_data$submitter_unique_id <- newid
+        message("Colnames:")
+        message(paste(colnames(submitted_data), sep= " | "))
+        # Get the Google Drive sheet
+        worksdb <- googledrive::drive_get("nov10_shinytest_works")
+        # for(i in 1:nrow(submitted_data)){
+          googlesheets4::sheet_append(ss=worksdb, data=submitted_data, sheet=1)
+        #}
+
+        remove_modal_spinner()
+    }, once = TRUE, ignoreInit = T)
+    # })    
+}
+)
