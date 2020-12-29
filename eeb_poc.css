@@ -36,7 +36,7 @@ width:121px;
 height: 35px;
 line-height: 35px;
 float:left;
-/*color:#000000;
+/*color:#333333;
 */font-family: Verdana, Arial, Helvetica, sans-serif;
 }
 
@@ -66,7 +66,7 @@ text-align:left;
 top:14px;
 left:10px;
 font-size:63px;
-color:#000000;
+color:#333333;
 font-family: Verdana,Arial, Helvetica, sans-serif;
 font-style:bold;
 
@@ -79,7 +79,7 @@ text-align:left;
 top:12px;
 left:12px;
 font-size:23px;
-color:#000000;
+color:#333333;
 font-family: Verdana,Arial, Helvetica, sans-serif;
 }
 
@@ -88,7 +88,7 @@ font-family: Verdana,Arial, Helvetica, sans-serif;
 margin-top:10px;
 width:800px;
 height:auto;
-background-color:#000000;
+background-color:#333333;
 padding-bottom:20px;
 }
 
@@ -100,7 +100,7 @@ width:780px;
 height:auto;
 top:10px;
 background-image:url(contentBack.png);
-background-color:#ffffe6;
+background-color:#ffffe6	;
 background-repeat:repeat-x;
 }
 
@@ -113,7 +113,7 @@ margin-bottom:2px;
 padding-top:2px;
 margin-left:15px;
 margin-top:15px;
-color:#000000;
+color:#333333;
 }
 
 h2
@@ -127,7 +127,7 @@ margin-bottom:2px;
 padding-top:2px;
 margin-left:-400px;
 margin-top:15px;
-color:#000000;
+color:#333333;
 }
 
 h3
@@ -140,7 +140,7 @@ margin-bottom:2px;
 padding-top:2px;
 margin-left:15px;
 margin-top:15px;
-color:#000000;
+color:#333333;
 }
 
 .contentText
@@ -156,13 +156,13 @@ text-align:center;
 padding-top:30px;
 font-size:9px;
 font-family:Verdana, Arial, Helvetica, sans-serif;
-color:#000000;
+color:#333333;
 margin:0px;
 }
 
 #footer a
 {
-color:#000000;
+color:#333333;
 text-decoration:none;
 font-size:9px;
 }
@@ -196,7 +196,7 @@ blockquote {
 	font-size:12px;
 	text-align:justify;
 	width:400px;
-	color:#000000;
+	color:#333333;
 	padding:15px;
 	margin:10px;
 	font-family:Verdana,Arial, Helvetica, sans-serif;
