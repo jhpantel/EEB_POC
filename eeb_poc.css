@@ -1,4 +1,4 @@
-
+	
 
 body {
 	margin: 0;
@@ -6,8 +6,8 @@ body {
 	text-align: left;
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	font-size: 16px;
-	color: #000000;
-	background: #FFFFFF;
+	color: #ffffe6;
+	background: #ffffe6;
 	background-repeat:repeat-x;
 }
 *
@@ -45,7 +45,7 @@ float:left;
 clear:both;
 width:800px;
 height:400px;
-background-color:#000000;
+background-color:#ffffe6;
 }
 
 #mainPicture .picture
@@ -100,7 +100,7 @@ width:780px;
 height:auto;
 top:10px;
 background-image:url(contentBack.png);
-background-color:#FFFFFF;
+background-color:#ffffe6;
 background-repeat:repeat-x;
 }
 
