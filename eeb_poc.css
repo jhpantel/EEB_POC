@@ -6,7 +6,7 @@ body {
 	text-align: left;
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	font-size: 16px;
-	color: #ffffe6;
+	color: #333333;
 	background: #ffffe6;
 	background-repeat:repeat-x;
 }
@@ -88,7 +88,7 @@ font-family: Verdana,Arial, Helvetica, sans-serif;
 margin-top:10px;
 width:800px;
 height:auto;
-background-color:#333333;
+background-color:#ffffe6;
 padding-bottom:20px;
 }
 
