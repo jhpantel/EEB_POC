@@ -28,22 +28,6 @@ Released under Creative Commons Attribution 2.5 Generic.
 
 <!-- Tabletop for linking with google sheet  -->
 <script src='https://cdnjs.cloudflare.com/ajax/libs/tabletop.js/1.5.1/tabletop.min.js'></script>
-<script type='text/javascript'>    
-  var publicSpreadsheetUrl = 'https://docs.google.com/spreadsheets/d/12wUUoBnvtkOwki4t2-9wyIegp4Y_gk_VPyfFrNbf7Zw/edit?usp=sharing';
-
-  function init() {
-    Tabletop.init( { key: publicSpreadsheetUrl,
-                     callback: showInfo,
-                     simpleSheet: true } )
-  }
-
-  function showInfo(data, tabletop) {
-    alert('Successfully processed!')
-    console.log(data);
-  }
-
-  window.addEventListener('DOMContentLoaded', init)
-</script>
 
 
 
@@ -112,16 +96,33 @@ var table2 = new Tabulator("#eeb_poc-table", {
 });
 
 var tabledata2;
+   
+var publicSpreadsheetUrl = 'https://docs.google.com/spreadsheets/d/12wUUoBnvtkOwki4t2-9wyIegp4Y_gk_VPyfFrNbf7Zw/edit?usp=sharing';
 
-Papa.parse('database/EEB_POC_database.csv', {
-    header: true,
-    download: true,
-    complete: function(results) {
-        console.log("Finished:", 
-            tabledata2 =results.data);
-            table2.setData(results.data);
-    }
-});
+  function init() {
+    Tabletop.init( { key: publicSpreadsheetUrl,
+                     callback: showInfo,
+                     simpleSheet: true } )
+  }
+
+  function showInfo(data, tabletop) {
+    // alert('Successfully processed!') 
+    console.log("Finished:", 
+        tabledata2 = data);
+    table2.setData(data);
+  }
+
+  window.addEventListener('DOMContentLoaded', init)
+
+// Papa.parse('database/EEB_POC_database.csv', {
+//     header: true,
+//     download: true,
+//     complete: function(results) {
+//         console.log("Finished:", 
+//             tabledata2 =results.data);
+//             table2.setData(results.data);
+//     }
+// });
 
 
 
