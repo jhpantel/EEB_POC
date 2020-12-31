@@ -213,6 +213,10 @@ blockquote {
 	border-color:#C87002;
 }
 
+code {
+  background-color:#EEEEEE;
+  font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New;
+}
 
 html, body {
 text-align: center;
