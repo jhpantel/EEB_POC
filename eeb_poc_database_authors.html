@@ -70,12 +70,28 @@ var table2 = new Tabulator("#eeb_poc-table", {
     columns:[ //Define Table Columns
         {title:"submitter_unique_id", field:"submitter_unique_id", sorter:"string"},
         // {title:"Authors", field:"Authors", sorter:"string"},
-        {title:"Title", field:"Title", sorter:"string"},
-        {title:"Journal", field:"Journal", sorter:"string"},
-        {title:"Year", field:"Year", sorter:"number"},
-        {title:"Date", field:"Date", sorter:"string"},
-        {title:"ORCID.Path", field:"ORCID.Path", sorter:"string"},
-        {title:"DOI", field:"DOI", sorter:"string"},
+        {title:"name", field:"name", sorter:"string"},
+        {title:"institution", field:"institution", sorter:"string"},
+        {title:"email", field:"email", sorter:"string"},
+        {title:"site", field:"site", sorter:"string"},
+        {title:"country", field:"country", sorter:"string"},
+        {title:"scholar", field:"scholar", sorter:"string"},
+        {title:"orcid", field:"orcid", sorter:"string"},
+        {title:"twitter", field:"twitter", sorter:"string"},
+        {title:"careerstage", field:"careerstage", sorter:"string"},
+        {title:"gender", field:"gender", sorter:"string"},
+        {title:"bipoc", field:"bipoc", sorter:"string"},
+        {title:"bipoc_specify", field:"bipoc_specify", sorter:"string"},
+        {title:"disability", field:"disability", sorter:"string"},
+        {title:"other_underrep_minority", field:"other_underrep_minority", sorter:"string"},
+        {title:"other_underrep_minority_specify", field:"other_underrep_minority_specify", sorter:"string"},
+        {title:"subdisc", field:"subdisc", sorter:"string"},
+        {title:"disc_specify", field:"disc_specify", sorter:"string"},
+        {title:"keywords", field:"keywords", sorter:"string"},
+        {title:"refers", field:"refers", sorter:"string"},
+        {title:"speaking_ops", field:"speaking_ops", sorter:"string"},
+        {title:"upload_date", field:"upload_date", sorter:"string"},
+
     ],
     // rowClick:function(e, row){ //trigger an alert message when the row is clicked
     //     alert("Row " + row.getData().id + " Clicked!!!!");
@@ -84,7 +100,7 @@ var table2 = new Tabulator("#eeb_poc-table", {
 
 var tabledata2;
    
-var publicSpreadsheetUrl = 'https://docs.google.com/spreadsheets/d/14Y582MA-4ANGSlh2Zby5h_gKynyKNhvaoY0wJLcAHo4/edit?usp=sharing';
+var publicSpreadsheetUrl = 'https://docs.google.com/spreadsheets/d/1gdUUGmM2nGJMTrhcVHmY-ikiHsUEt6A5GwlsnK3LXCQ/edit?usp=sharing';
 
   function init() {
     Tabletop.init( { key: publicSpreadsheetUrl,
