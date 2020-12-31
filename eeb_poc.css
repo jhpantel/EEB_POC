@@ -1,17 +1,17 @@
 @font-face {
-    font-family: Computer Modern;
+    font-family:Computer Modern;
     src: url(https://cdn.jsdelivr.net/gh/aaaakshat/cm-web-fonts@latest/fonts.css);
   }
 	
 * {
-   font-family: Computer Modern;
+   font-family:Computer Modern;
 }
 
 body {
 	margin: 0;
 	padding: 0;
 	text-align: left;
-	font-family: Computer Modern, Arial, serif;
+	font-family:Computer Modern, Arial, serif;
 	font-size: 16px;
 	color: #333333;
 	background: #ffffe6;
@@ -44,7 +44,7 @@ height: 35px;
 line-height: 35px;
 float:left;
 /*color:#333333;
-*/font-family: Computer Modern, Arial, serif;
+*/font-family:Computer Modern, Arial, serif;
 }
 
 #mainPicture
@@ -74,7 +74,7 @@ top:14px;
 left:10px;
 font-size:63px;
 color:#333333;
-font-family: Computer Modern, Arial, serif;
+font-family:Computer Modern, Arial, serif;
 font-style:bold;
 
 }
@@ -87,7 +87,7 @@ top:12px;
 left:12px;
 font-size:23px;
 color:#333333;
-font-family: Computer Modern, Arial, serif;
+font-family:Computer Modern, Arial, serif;
 }
 
 .contentBox
@@ -140,7 +140,7 @@ h3
 {
 text-align:center;
 font-family:Computer Modern, Arial, serif;
-font-style: italic;
+/*font-style: italic;*/
 font-size:23px;
 margin-bottom:2px;
 padding-top:2px;
