@@ -1,6 +1,9 @@
 @font-face {
     font-family: "Computer Modern";
     src: url('https://cdn.jsdelivr.net/gh/aaaakshat/cm-web-fonts@latest/fonts.css');
+    src: url("https://cdn.jsdelivr.net/gh/aaaakshat/cm-web-fonts@latest/fonts.css") format("woff"),
+	url("https://cdn.jsdelivr.net/gh/aaaakshat/cm-web-fonts@latest/fonts.css") format("opentype"),
+	url("https://cdn.jsdelivr.net/gh/aaaakshat/cm-web-fonts@latest/fonts.css") format("svg");
   }
 	
 
