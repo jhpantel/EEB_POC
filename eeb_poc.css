@@ -125,14 +125,14 @@ color:#333333;
 
 h2
 {
-text-align:center;
+text-align:left;
 position:relative;
 margin-top:10px;
 font-family:Computer Modern, Arial, serif;
 font-size:28px;
 margin-bottom:2px;
 padding-top:2px;
-margin-left:-400px;
+margin-left:15px;
 margin-top:15px;
 color:#333333;
 }
