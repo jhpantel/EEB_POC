@@ -106,7 +106,7 @@ position:relative;
 width:780px;
 height:auto;
 top:10px;
-background-image:url(contentBack.png);
+/*background-image:url(contentBack.png);*/
 background-color:#ffffe6	;
 background-repeat:repeat-x;
 }
