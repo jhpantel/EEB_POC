@@ -50,16 +50,16 @@ float:left;
 #mainPicture
 {
 clear:both;
-width:800px;
-height:400px;
+width:820px;
+height:280px;
 background-color:#ffffe6;
 }
 
 #mainPicture .picture
 {
 position:relative;
-width:780px;
-height:380px;
+width:800px;
+height:260px;
 top:10px;
 margin-left:10px;
 background-image:url(eeb_poc_cutletters.png);
