@@ -72,13 +72,15 @@ var table2 = new Tabulator("#eeb_poc-table", {
     height:"311px", // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
     layout:"fitColumns", //fit columns to width of table (optional)
     columns:[ //Define Table Columns
-        {title:"submitter_unique_id", field:"submitter_unique_id", sorter:"string"},
-        // {title:"Authors", field:"Authors", sorter:"string"},
+        {title:"Authors", field:"Authors", sorter:"string"},
         {title:"Title", field:"Title", sorter:"string"},
-        {title:"Journal", field:"Journal", sorter:"string"},
+        {title:"Publication", field:"Publication", sorter:"string"},
+        {title:"Volume", field:"Volume", sorter:"number"},
+        {title:"Number", field:"Number", sorter:"number"},
+        {title:"Pages", field:"Pages", sorter:"number"},
         {title:"Year", field:"Year", sorter:"number"},
-        {title:"Date", field:"Date", sorter:"string"},
-        {title:"ORCID.Path", field:"ORCID.Path", sorter:"string"},
+        {title:"Keywords", field:"Keywords", sorter:"string"},
+        {title:"ORCID (lead author)", field:"ORCID (lead author)", sorter:"string"},
         {title:"DOI", field:"DOI", sorter:"string"},
     ],
     // rowClick:function(e, row){ //trigger an alert message when the row is clicked
@@ -87,38 +89,18 @@ var table2 = new Tabulator("#eeb_poc-table", {
 });
 
 var tabledata2;
-   
-var publicSpreadsheetUrl = 'https://docs.google.com/spreadsheets/d/14Y582MA-4ANGSlh2Zby5h_gKynyKNhvaoY0wJLcAHo4/edit?usp=sharing';
 
-  function init() {
-    Tabletop.init( { key: publicSpreadsheetUrl,
-                     callback: showInfo,
-                     simpleSheet: true } )
-  }
-
-  function showInfo(data, tabletop) {
-    // alert('Successfully processed!') 
-    console.log("Finished:", 
-        tabledata2 = data);
-    table2.setData(data);
-  }
-
-  window.addEventListener('DOMContentLoaded', init)
-
-// Papa.parse('database/EEB_POC_database.csv', {
-//     header: true,
-//     download: true,
-//     complete: function(results) {
-//         console.log("Finished:", 
-//             tabledata2 =results.data);
-//             table2.setData(results.data);
-//     }
-// });
-
-
+Papa.parse('database/EEB_POC_database.csv', {
+    header: true,
+    download: true,
+    complete: function(results) {
+        console.log("Finished:", 
+            tabledata2 =results.data);
+            table2.setData(results.data);
+    }
+});
 
 </script>
-
 
 
 
