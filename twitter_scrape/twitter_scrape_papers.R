@@ -309,7 +309,7 @@ for (n in 1:nt) {
 # existing) databse in the form of a tab-delimited CSV file. 
 #=============================================================================
 
-file_name = "./database/EEB_POC_database.csv"
+file_name = "./../database/EEB_POC_database.csv"
 nrows = length(new_papers)
 new_csv_df =data.frame(matrix(unlist(new_papers), nrow=nrows, byrow=T),stringsAsFactors=FALSE)
 csv_names = c("Authors", "Title", "Publication", "Volume", "Number", "Pages", "Year",

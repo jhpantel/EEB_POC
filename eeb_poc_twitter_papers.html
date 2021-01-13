@@ -32,7 +32,7 @@ Released under Creative Commons Attribution 2.5 Generic.
 <!-- Computer Modern font  -->
 <!-- <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/aaaakshat/cm-web-fonts@latest/fonts.css">
  -->
-<title>EEB_POC: Papers of Color database</title>
+<title>EEB_POC: Papers of Color twitter database</title>
 
 </head>
 
@@ -50,15 +50,14 @@ Released under Creative Commons Attribution 2.5 Generic.
 <div class="contentBox">
     <div class="innerBox">
         <div class="contentText">
-        <p>This is the database of scholars that have been submitted by those that self-identify as POC, or collected from our Twitter account (@EEB_POC). </p><br />
+        <p>This is the database of papers that have been tweeted by representing @EEB_POC. </p><br />
         <p>If you would like to submit a paper to the databse, please follow the link below to use our submission form</p>
         <h1><a href="https://eebpoc-database.shinyapps.io/eebpoc_author_information_portal/">
             <img border="0" alt="Submit" src="eeb_poc_submit.png" width="448" height="120"></a></h1> 
-        <h1><a href="https://eeb-bipoc-db.github.io/EEB_POC/eeb_poc_database_papers.html">
+         <h1><a href="https://eeb-bipoc-db.github.io/EEB_POC/eeb_poc_database_authors.html">
+            <img border="0" alt="Authors" src="eeb_poc_authors.png" width="448" height="120"></a></h1> 
+         <h1><a href="https://eeb-bipoc-db.github.io/EEB_POC/eeb_poc_database_papers.html">
             <img border="0" alt="Papers" src="eeb_poc_papers.png" width="448" height="120"></a></h1> 
-        <h1><a href="https://eeb-bipoc-db.github.io/EEB_POC/eeb_poc_twitter_papers.html">
-            <img border="0" alt="Papers" src="eeb_poc_twitdb.png" width="448" height="120"></a></h1> 
-        <h3><a href="index.html">Back to Announcement page</a></h1>
         <br />
         <p>This table is interactive. Drag column borders to change widths. </p><br />
         </div>
@@ -75,28 +74,12 @@ var table2 = new Tabulator("#eeb_poc-table", {
     columns:[ //Define Table Columns
         {title:"submitter_unique_id", field:"submitter_unique_id", sorter:"string"},
         // {title:"Authors", field:"Authors", sorter:"string"},
-        {title:"name", field:"name", sorter:"string"},
-        {title:"institution", field:"institution", sorter:"string"},
-        {title:"email", field:"email", sorter:"string"},
-        {title:"site", field:"site", sorter:"string"},
-        {title:"country", field:"country", sorter:"string"},
-        {title:"scholar", field:"scholar", sorter:"string"},
-        {title:"orcid", field:"orcid", sorter:"string"},
-        {title:"twitter", field:"twitter", sorter:"string"},
-        {title:"careerstage", field:"careerstage", sorter:"string"},
-        {title:"gender", field:"gender", sorter:"string"},
-        {title:"bipoc", field:"bipoc", sorter:"string"},
-        {title:"bipoc_specify", field:"bipoc_specify", sorter:"string"},
-        {title:"disability", field:"disability", sorter:"string"},
-        {title:"other_underrep_minority", field:"other_underrep_minority", sorter:"string"},
-        {title:"other_underrep_minority_specify", field:"other_underrep_minority_specify", sorter:"string"},
-        {title:"subdisc", field:"subdisc", sorter:"string"},
-        {title:"disc_specify", field:"disc_specify", sorter:"string"},
-        {title:"keywords", field:"keywords", sorter:"string"},
-        {title:"refers", field:"refers", sorter:"string"},
-        {title:"speaking_ops", field:"speaking_ops", sorter:"string"},
-        {title:"upload_date", field:"upload_date", sorter:"string"},
-
+        {title:"Title", field:"Title", sorter:"string"},
+        {title:"Journal", field:"Journal", sorter:"string"},
+        {title:"Year", field:"Year", sorter:"number"},
+        {title:"Date", field:"Date", sorter:"string"},
+        {title:"ORCID.Path", field:"ORCID.Path", sorter:"string"},
+        {title:"DOI", field:"DOI", sorter:"string"},
     ],
     // rowClick:function(e, row){ //trigger an alert message when the row is clicked
     //     alert("Row " + row.getData().id + " Clicked!!!!");
@@ -105,7 +88,7 @@ var table2 = new Tabulator("#eeb_poc-table", {
 
 var tabledata2;
    
-var publicSpreadsheetUrl = 'https://docs.google.com/spreadsheets/d/1gdUUGmM2nGJMTrhcVHmY-ikiHsUEt6A5GwlsnK3LXCQ/edit?usp=sharing';
+var publicSpreadsheetUrl = 'https://docs.google.com/spreadsheets/d/14Y582MA-4ANGSlh2Zby5h_gKynyKNhvaoY0wJLcAHo4/edit?usp=sharing';
 
   function init() {
     Tabletop.init( { key: publicSpreadsheetUrl,
