@@ -39,7 +39,7 @@ shinyApp(
     shinyjs::useShinyjs(),
     # titlePanel("POC Authors in Ecology, Evolution, and Biological Sciences"),
     tags$div(class = "h2",
-      "POC Authors in Ecology, Evolution, and Behavioural Sciences: Author Submission Portal"
+      "BIPOC Scholars in Behavioral Sciences, Ecology, Evolution, and Environmental Studies (BEEES): Author Submission Portal"
     ),
     tags$div(class = "h4",
     "App created by Mairin Deith, mdeith@zoology[.]ubc[.]ca"),
@@ -48,7 +48,7 @@ shinyApp(
 
     tabPanel(title = "Author Information",
     sidebarPanel(
-      helpText("The Graduate Diversity Council in the Department of Environmental Science, Policy, & Management at UC Berkeley and collaborators from UBC (Vancouver) are seeking to increase visibility of scholars with underrepresented racial backgrounds in our seminar series, course syllabuses, and citation practices. To that end, we are assembling a list of BIPOC (Black, Indigenous, Person of Color) scholars in fields related to environmental sciences (including natural, social, and/or physical sciences)."),
+      helpText("The Graduate Diversity Council in the Department of Environmental Science, Policy, & Management at UC Berkeley and collaborators from UBC (Vancouver) are seeking to increase visibility of scholars with underrepresented racial backgrounds in our seminar series, course syllabuses, and citation practices. To that end, we are assembling a list of BIPOC (Black, Indigenous, Person of Color) scholars in fields related to environmental studies (including natural, social, physical sciences, and/or environmental humanities)."),
       br(),
       helpText("If you identify as a scholar in environmental sciences from an underrepresented racial or ethnic background, we would love to include you on a list that will be used for future seminar series and revising course syllabuses. Please take a few minutes to fill out this form and share it with others in your network!"),
       br(),
